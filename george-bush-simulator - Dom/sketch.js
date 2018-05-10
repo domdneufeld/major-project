@@ -35,6 +35,7 @@ class Trivia {
     this.mouseOverButtonThree = false;
     this.mouseOverButtonFour = false;
     this.buttonTextSize = 24;
+    this.buttonChoice;
 
     // question variables
     this.questionWidth = 620;
@@ -109,8 +110,8 @@ class Trivia {
     }
 
     // Button three
-    if (mouseX <= 160 - this.buttonWidth / 2 || mouseX >= 160 + this.buttonWidth / 2 ||
-      mouseY <= 580 - this.buttonHeight / 2 || mouseY >= 580 + this.buttonHeight / 2) {
+    if (mouseX >= 160 - this.buttonWidth / 2 || mouseX <= 160 + this.buttonWidth / 2 ||
+      mouseY >= 580 - this.buttonHeight / 2 || mouseY <= 580 + this.buttonHeight / 2) {
       this.mouseOverButtonThree = true;
     }
     else {
@@ -118,8 +119,8 @@ class Trivia {
     }
 
     // Button four
-    if (mouseX <= 480 - this.buttonWidth / 2 || mouseX >= 480 + this.buttonWidth / 2 ||
-      mouseY <= 580 - this.buttonHeight / 2 || mouseY >= 580 + this.buttonHeight / 2) {
+    if (mouseX >= 480 - this.buttonWidth / 2 || mouseX <= 480 + this.buttonWidth / 2 ||
+      mouseY >= 580 - this.buttonHeight / 2 || mouseY <= 580 + this.buttonHeight / 2) {
       this.mouseOverButtonFour = true;
     }
     else {
@@ -133,14 +134,9 @@ class Trivia {
     rect(this.questionx, this.questiony, this.questionWidth, this.questionHeight);
   }
 
-  buttonPressed(button) {
-    triviaState = 2;
-    myTrivia.displayChoice(button);
-  }
-
-  displayChoice(button){
+  displayChoice(){
     fill(0);
-    text("You pressed button" + str(button), width/2, height/2);
+    text("You pressed button " + this.buttonChoice, width/2, height/2);
   }
 }
 
@@ -148,16 +144,27 @@ function mousePressed() {
   // Makes buttons clickable
   if (state === 1 && gameState === 1 && triviaState === 1) {
     if (myTrivia.mouseOverButtonOne) {
-      myTrivia.buttonPressed(1);
+      triviaState = 2;
+      myTrivia.buttonChoice = 1;
+      myTrivia.displayChoice();
     }
+
     if (myTrivia.mouseOverButtonTwo) {
-      myTrivia.buttonPressed(2);
+      triviaState = 2;
+      myTrivia.buttonChoice = 2;
+      myTrivia.displayChoice();
     }
+
     if (myTrivia.mouseOverButtonThree) {
-      myTrivia.buttonPressed(3);
+      triviaState = 2;
+      myTrivia.buttonChoice = 3;
+      myTrivia.displayChoice();
     }
+
     if (myTrivia.mouseOverButtonFour) {
-      myTrivia.buttonPressed(4);
+      triviaState = 2;
+      myTrivia.buttonChoice = 4;
+      myTrivia.displayChoice();
     }
   }
 }
