@@ -1,34 +1,121 @@
-// p5js template project - replace with project title
-// Dan Schellenberg - replace with your name
-// Feb 2, 2018 - replace with the date
+let myTrivia;
 
-// global variables
-let gear;
+//Variable for trivia game: 1 = top left 2 = top right, 3 = bottom left, 4 = bottom right;
+let buttonChoice;
 
-// the preload function guarentees that the code inside the function is
-// executed before the rest of the program runs -- helpful for things
-// like loading images (since JS is asynchronous)
-function preload() {
-  gear = loadImage("images/gear.png");
-}
-
-// the setup function will only run once (before the draw loop begins)
-// this is where you want to set up the environment (size of canvas, etc)
 function setup() {
-  createCanvas(windowWidth, windowHeight);
+  createCanvas(640, 640);
+  myTrivia = new Trivia;
 }
 
 function draw() {
-  background(255);
+  background(200);
 
-  image(gear, 0, 0);
+  // Trivia game
+  myTrivia.displayButtons();
+  myTrivia.isMouseOverButton();
+}
 
-  stroke(0);
-  line(0, 0, 200, 200);
+class Trivia {
+  constructor() {
+    this.buttonWidth = 300;
+    this.buttonHeight = 80;
+    this.mouseOverButtonOne = false;
+    this.mouseOverButtonTwo = false;
+    this.mouseOverButtonThree = false;
+    this.mouseOverButtonFour = false;
+    this.textSize = 24;
+  }
 
-  fill(0, 255, 0, 100);
-  noStroke();
+  displayButtons() {
+    rectMode(CENTER);
+    textSize(this.textSize);
+    textAlign(CENTER, CENTER);
 
-  rect(mouseX, mouseY, 100, 300);
-  ellipse(400, 150, 300, 200);
+    // Top left button == buttonOne
+    fill(0, 0, 255);
+    if (this.mouseOverButtonOne) {
+      fill(0, 0, 200);
+    }
+    rect(160, 480, this.buttonWidth, this.buttonHeight);
+
+    fill(0);
+    text("example", 160, 480);
+
+    // Top right button == buttonTwo
+    fill(0, 0, 255);
+    if (this.mouseOverButtonTwo) {
+      fill(0, 0, 200);
+    }
+    rect(480, 480, this.buttonWidth, this.buttonHeight);
+
+    fill(0);
+    text("example", 480, 480);
+
+    // Bottom left button == buttonThree
+    fill(0, 0, 255);
+    if (this.mouseOverButtonThree) {
+      fill(0, 0, 200);
+    }
+    rect(160, 580, this.buttonWidth, this.buttonHeight);
+
+    fill(0);
+    text("example", 160, 580);
+
+    // Bottom right button == ButtonFour
+    fill(0, 0, 255);
+    if (this.mouseOverButtonFour) {
+      fill(0, 0, 200);
+    }
+    rect(480, 580, this.buttonWidth, this.buttonHeight);
+
+    fill(0);
+    text("example", 480, 580);
+  }
+
+  isMouseOverButton() {
+    // Button one
+    if (mouseX <= 160 - this.buttonWidth / 2 || mouseX >= 160 + this.buttonWidth / 2 ||
+      mouseY <= 480 - this.buttonHeight / 2 || mouseY >= 480 + this.buttonHeight / 2) {
+      this.mouseOverButtonOne = true;
+    }
+    else {
+      this.mouseOverButtonOne = false;
+    }
+
+    // Button two
+    if (mouseX <= 480 - this.buttonWidth / 2 || mouseX >= 480 + this.buttonWidth / 2 ||
+      mouseY <= 480 - this.buttonHeight / 2 || mouseY >= 480 + this.buttonHeight / 2) {
+      this.mouseOverButtonTwo = true;
+    }
+    else {
+      this.mouseOverButtonTwo = false;
+    }
+
+    // Button three
+    if (mouseX <= 160 - this.buttonWidth / 2 || mouseX >= 160 + this.buttonWidth / 2 ||
+      mouseY <= 580 - this.buttonHeight / 2 || mouseY >= 580 + this.buttonHeight / 2) {
+      this.mouseOverButtonThree = true;
+    }
+    else {
+      this.mouseOverButtonThree = false;
+    }
+
+    // Button four
+    if (mouseX <= 480 - this.buttonWidth / 2 || mouseX >= 480 + this.buttonWidth / 2 ||
+      mouseY <= 580 - this.buttonHeight / 2 || mouseY >= 580 + this.buttonHeight / 2) {
+      this.mouseOverButtonFour = true;
+    }
+    else {
+      this.mouseOverButtonFour = false;
+    }
+  }
+
+  displayQuestion() {
+
+  }
+}
+
+function mousePressed() {
+
 }
