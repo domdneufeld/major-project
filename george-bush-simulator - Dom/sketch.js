@@ -1,4 +1,11 @@
+let triviaQuestions = [
+  ["Rarely is the question asked, is our _____?", "Children Learning?", "Flag the coolest?", "Our country great?", "Neighbors sneaking?", 4, 2, 1, 3],
+  ["Our enemies are innovative and resourceful, and so are we. They never stop thinking about new ways to harm our country and our people, _____.", "And neither do we.", "But their leader isn’t nearly as handsome. ", "And frankly that’s just plain old unacceptable.", "And they must be stopped.", 4, 2, 3, 1],
+  [],
+];
+
 let myTrivia;
+
 let state = 1;
 let gameState = 1;
 let triviaState = 1;
@@ -13,14 +20,14 @@ function setup() {
 function draw() {
   background(200);
 
+  myTrivia.isMouseOverButton();
   // Trivia game
-  if (triviaState === 1){
+  if (triviaState === 1) {
     myTrivia.displayButtons();
     myTrivia.displayQuestion();
-    myTrivia.isMouseOverButton();
   }
 
-  if (triviaState === 2){
+  if (triviaState === 2) {
     myTrivia.displayChoice();
   }
 }
@@ -34,14 +41,16 @@ class Trivia {
     this.mouseOverButtonTwo = false;
     this.mouseOverButtonThree = false;
     this.mouseOverButtonFour = false;
+    this.mouseOverNextQuestion = false;
     this.buttonTextSize = 24;
-    this.buttonChoice;
-
+    this.buttonChoice = 0;
     // question variables
     this.questionWidth = 620;
     this.questionHeight = 120;
     this.questionx = width / 2;
     this.questiony = 360;
+    // chooses the question
+    this.triviaLevel = 0;
   }
 
   displayButtons() {
@@ -50,81 +59,93 @@ class Trivia {
     textAlign(CENTER, CENTER);
 
     // Top left button == buttonOne
-    fill(255, 0, 0);
+    fill(175, 0, 0);
     if (this.mouseOverButtonOne) {
-      fill(175, 0, 0);
+      fill(255, 0, 0);
     }
     rect(160, 480, this.buttonWidth, this.buttonHeight);
 
     fill(0);
-    text("Button One", 160, 480);
+    text(triviaQuestions[this.triviaLevel][1], 160, 480);
 
     // Top right button == buttonTwo
-    fill(255, 0, 0);
+    fill(175, 0, 0);
     if (this.mouseOverButtonTwo) {
-      fill(175, 0, 0);
+      fill(255, 0, 0);
     }
     rect(480, 480, this.buttonWidth, this.buttonHeight);
 
     fill(0);
-    text("Button Two", 480, 480);
+    text(triviaQuestions[this.triviaLevel][2], 480, 480);
 
     // Bottom left button == buttonThree
-    fill(255, 0, 0);
+    fill(175, 0, 0);
     if (this.mouseOverButtonThree) {
-      fill(175, 0, 0);
+      fill(255, 0, 0);
     }
     rect(160, 580, this.buttonWidth, this.buttonHeight);
 
     fill(0);
-    text("Button Three", 160, 580);
+    text(triviaQuestions[this.triviaLevel][3], 160, 580);
 
     // Bottom right button == ButtonFour
-    fill(255, 0, 0);
+    fill(175, 0, 0);
     if (this.mouseOverButtonFour) {
-      fill(175, 0, 0);
+      fill(255, 0, 0);
     }
     rect(480, 580, this.buttonWidth, this.buttonHeight);
 
     fill(0);
-    text("Button Four", 480, 580);
+    text(triviaQuestions[this.triviaLevel][4], 480, 580);
   }
 
   isMouseOverButton() {
-    // Button one
-    if (mouseX <= 160 - this.buttonWidth / 2 || mouseX >= 160 + this.buttonWidth / 2 ||
-      mouseY <= 480 - this.buttonHeight / 2 || mouseY >= 480 + this.buttonHeight / 2) {
-      this.mouseOverButtonOne = true;
-    }
-    else {
-      this.mouseOverButtonOne = false;
-    }
+    if (triviaState === 1){
+      // Button one
+      if (mouseX >= 160 - this.buttonWidth / 2 && mouseX <= 160 + this.buttonWidth / 2 &&
+        mouseY >= 480 - this.buttonHeight / 2 && mouseY <= 480 + this.buttonHeight / 2) {
+        this.mouseOverButtonOne = true;
+      }
+      else {
+        this.mouseOverButtonOne = false;
+      }
 
-    // Button two
-    if (mouseX <= 480 - this.buttonWidth / 2 || mouseX >= 480 + this.buttonWidth / 2 ||
-      mouseY <= 480 - this.buttonHeight / 2 || mouseY >= 480 + this.buttonHeight / 2) {
-      this.mouseOverButtonTwo = true;
-    }
-    else {
-      this.mouseOverButtonTwo = false;
-    }
+      // Button two
+      if (mouseX >= 480 - this.buttonWidth / 2 && mouseX <= 480 + this.buttonWidth / 2 &&
+        mouseY >= 480 - this.buttonHeight / 2 && mouseY <= 480 + this.buttonHeight / 2) {
+        this.mouseOverButtonTwo = true;
+      }
+      else {
+        this.mouseOverButtonTwo = false;
+      }
 
-    // Button three
-    if (mouseX >= 160 - this.buttonWidth / 2 || mouseX <= 160 + this.buttonWidth / 2 ||
-      mouseY >= 580 - this.buttonHeight / 2 || mouseY <= 580 + this.buttonHeight / 2) {
-      this.mouseOverButtonThree = true;
-    }
-    else {
-      this.mouseOverButtonThree = false;
-    }
+      // Button three
+      if (mouseX >= 160 - this.buttonWidth / 2 && mouseX <= 160 + this.buttonWidth / 2 &&
+        mouseY >= 580 - this.buttonHeight / 2 && mouseY <= 580 + this.buttonHeight / 2) {
+        this.mouseOverButtonThree = true;
+      }
+      else {
+        this.mouseOverButtonThree = false;
+      }
 
-    // Button four
-    if (mouseX >= 480 - this.buttonWidth / 2 || mouseX <= 480 + this.buttonWidth / 2 ||
-      mouseY >= 580 - this.buttonHeight / 2 || mouseY <= 580 + this.buttonHeight / 2) {
-      this.mouseOverButtonFour = true;
+      // Button four
+      if (mouseX >= 480 - this.buttonWidth / 2 && mouseX <= 480 + this.buttonWidth / 2 &&
+        mouseY >= 580 - this.buttonHeight / 2 && mouseY <= 580 + this.buttonHeight / 2) {
+        this.mouseOverButtonFour = true;
+      }
+      else {
+        this.mouseOverButtonFour = false;
+      }
     }
-    else {
-      this.mouseOverButtonFour = false;
+    else if (triviaState === 2){
+      // Next Question button
+      if (mouseX >= 320 - this.buttonWidth / 2 && mouseX <= 320 + this.buttonWidth / 2 &&
+        mouseY >= 400 - this.buttonHeight / 2 && mouseY <= 400 + this.buttonHeight / 2) {
+        this.mouseOverNextQuestion = true;
+      }
+      else {
+        this.mouseOverNextQuestion = false;
+      }
     }
   }
 
@@ -132,11 +153,26 @@ class Trivia {
     rectMode(CENTER);
     fill(175, 0, 0);
     rect(this.questionx, this.questiony, this.questionWidth, this.questionHeight);
+
+    textAlign(LEFT, TOP);
+    fill(0);
+    text(triviaQuestions[this.triviaLevel][0], this.questionx - this.questionWidth / 2 + 4, this.questiony - this.questionHeight / 2);
   }
 
-  displayChoice(){
+  displayChoice() {
     fill(0);
-    text("You pressed button " + this.buttonChoice, width/2, height/2);
+    textAlign(CENTER,CENTER);
+    text(triviaQuestions[this.triviaLevel][4 + this.buttonChoice], width / 2, height / 2);
+
+    // Next Question Button
+    fill(175, 0, 0);
+    if (this.mouseOverNextQuestion) {
+      fill(255, 0, 0);
+    }
+    rect(320, 400, this.buttonWidth, this.buttonHeight);
+
+    fill(0);
+    text("Next Question", 320, 400);
   }
 }
 
@@ -144,27 +180,29 @@ function mousePressed() {
   // Makes buttons clickable
   if (state === 1 && gameState === 1 && triviaState === 1) {
     if (myTrivia.mouseOverButtonOne) {
-      triviaState = 2;
       myTrivia.buttonChoice = 1;
-      myTrivia.displayChoice();
+      triviaState = 2;
     }
 
     if (myTrivia.mouseOverButtonTwo) {
-      triviaState = 2;
       myTrivia.buttonChoice = 2;
-      myTrivia.displayChoice();
+      triviaState = 2;
     }
 
     if (myTrivia.mouseOverButtonThree) {
-      triviaState = 2;
       myTrivia.buttonChoice = 3;
-      myTrivia.displayChoice();
+      triviaState = 2;
     }
 
     if (myTrivia.mouseOverButtonFour) {
-      triviaState = 2;
       myTrivia.buttonChoice = 4;
-      myTrivia.displayChoice();
+      triviaState = 2;
+    }
+  }
+  else if (state === 1 && gameState === 1 && triviaState === 2) {
+    if (myTrivia.mouseOverNextQuestion) {
+      myTrivia.triviaLevel += 1;
+      triviaState = 1;
     }
   }
 }

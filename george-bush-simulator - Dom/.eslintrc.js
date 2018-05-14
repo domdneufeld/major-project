@@ -22,7 +22,6 @@ module.exports = {
         "no-var": ["warn"],
 
         // override default options for rules from base configurations
-        "comma-dangle": ["warn", "always"],
         "no-cond-assign": ["error", "always"],
 
         // disable rules from base configurations
@@ -32,7 +31,7 @@ module.exports = {
     "globals": {
       //allow direct access to the DOM without errors
       "document": true,
-      "window": true,  
+      "window": true,
       //p5js globals
       "remove": true,
       "canvas": true,
