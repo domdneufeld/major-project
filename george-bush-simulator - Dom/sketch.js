@@ -154,9 +154,10 @@ class Trivia {
     fill(175, 0, 0);
     rect(this.questionx, this.questiony, this.questionWidth, this.questionHeight);
 
+    rectMode(CORNER);
     textAlign(LEFT, TOP);
     fill(0);
-    text(triviaQuestions[this.triviaLevel][0], this.questionx - this.questionWidth / 2 + 4, this.questiony - this.questionHeight / 2);
+    text(triviaQuestions[this.triviaLevel][0], this.questionx - this.questionWidth / 2 + 4, this.questiony - this.questionHeight / 2, this.questionWidth, this.questionHeight);
   }
 
   displayChoice() {
@@ -165,6 +166,7 @@ class Trivia {
     text(triviaQuestions[this.triviaLevel][4 + this.buttonChoice], width / 2, height / 2);
 
     // Next Question Button
+    rectMode(CENTER);
     fill(175, 0, 0);
     if (this.mouseOverNextQuestion) {
       fill(255, 0, 0);
