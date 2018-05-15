@@ -55,7 +55,6 @@ class Trivia {
 
   displayButtons() {
     rectMode(CENTER);
-    textSize(this.buttonTextSize);
     textAlign(CENTER, CENTER);
 
     // Top left button == buttonOne
@@ -66,7 +65,12 @@ class Trivia {
     rect(160, 480, this.buttonWidth, this.buttonHeight);
 
     fill(0);
-    text(triviaQuestions[this.triviaLevel][1], 160, 480);
+    // Makes the text smaller if the string is long
+    textSize(this.buttonTextSize);
+    if (triviaQuestions[this.triviaLevel][1].length >= 25) {
+      textSize(this.buttonTextSize - 4);
+    }
+    text(triviaQuestions[this.triviaLevel][1], 160, 480, this.buttonWidth, this.buttonHeight);
 
     // Top right button == buttonTwo
     fill(175, 0, 0);
@@ -76,7 +80,12 @@ class Trivia {
     rect(480, 480, this.buttonWidth, this.buttonHeight);
 
     fill(0);
-    text(triviaQuestions[this.triviaLevel][2], 480, 480);
+    // Makes the text smaller if the string is long
+    textSize(this.buttonTextSize);
+    if (triviaQuestions[this.triviaLevel][2].length >= 25) {
+      textSize(this.buttonTextSize - 4);
+    }
+    text(triviaQuestions[this.triviaLevel][2], 480, 480, this.buttonWidth, this.buttonHeight);
 
     // Bottom left button == buttonThree
     fill(175, 0, 0);
@@ -86,7 +95,12 @@ class Trivia {
     rect(160, 580, this.buttonWidth, this.buttonHeight);
 
     fill(0);
-    text(triviaQuestions[this.triviaLevel][3], 160, 580);
+    // Makes the text smaller if the string is long
+    textSize(this.buttonTextSize);
+    if (triviaQuestions[this.triviaLevel][3].length >= 25) {
+      textSize(this.buttonTextSize - 4);
+    }
+    text(triviaQuestions[this.triviaLevel][3], 160, 580, this.buttonWidth, this.buttonHeight);
 
     // Bottom right button == ButtonFour
     fill(175, 0, 0);
@@ -96,11 +110,16 @@ class Trivia {
     rect(480, 580, this.buttonWidth, this.buttonHeight);
 
     fill(0);
+    // Makes the text smaller if the string is long
+    textSize(this.buttonTextSize);
+    if (triviaQuestions[this.triviaLevel][4].length >= 20) {
+      textSize(this.buttonTextSize - 4);
+    }
     text(triviaQuestions[this.triviaLevel][4], 480, 580);
   }
 
   isMouseOverButton() {
-    if (triviaState === 1){
+    if (triviaState === 1) {
       // Button one
       if (mouseX >= 160 - this.buttonWidth / 2 && mouseX <= 160 + this.buttonWidth / 2 &&
         mouseY >= 480 - this.buttonHeight / 2 && mouseY <= 480 + this.buttonHeight / 2) {
@@ -137,7 +156,7 @@ class Trivia {
         this.mouseOverButtonFour = false;
       }
     }
-    else if (triviaState === 2){
+    else if (triviaState === 2) {
       // Next Question button
       if (mouseX >= 320 - this.buttonWidth / 2 && mouseX <= 320 + this.buttonWidth / 2 &&
         mouseY >= 400 - this.buttonHeight / 2 && mouseY <= 400 + this.buttonHeight / 2) {
@@ -155,6 +174,7 @@ class Trivia {
     rect(this.questionx, this.questiony, this.questionWidth, this.questionHeight);
 
     rectMode(CORNER);
+    textSize(this.buttonTextSize);
     textAlign(LEFT, TOP);
     fill(0);
     text(triviaQuestions[this.triviaLevel][0], this.questionx - this.questionWidth / 2 + 4, this.questiony - this.questionHeight / 2, this.questionWidth, this.questionHeight);
@@ -162,7 +182,7 @@ class Trivia {
 
   displayChoice() {
     fill(0);
-    textAlign(CENTER,CENTER);
+    textAlign(CENTER, CENTER);
     text(triviaQuestions[this.triviaLevel][4 + this.buttonChoice], width / 2, height / 2);
 
     // Next Question Button
