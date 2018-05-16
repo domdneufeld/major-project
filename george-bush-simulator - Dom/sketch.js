@@ -8,6 +8,10 @@ let triviaQuestions = [
   ["Africa is a ____ that suffers from incredible disease", "Country", "People", "Nation", "City", 0, 0, 1, 0],
 ];
 
+let speeches = [
+  "example phrase."
+];
+
 // Images
 let menuBackground;
 let angryBush; // radBush > gladBush > sadBush > angryBush
@@ -20,8 +24,11 @@ let myTrivia;
 let myMenu;
 let myTypingGame;
 
+// State variables
 let state = 0; //state 0 = menu, state 1 = trivia, state 2 = typing
-let triviaState = 1;
+let triviaState = 0; //state 0 = question, state 1 = feedback/next question menu
+let typingState = 0; //state 0 = game,
+
 //Variable for trivia game: 1 = top left 2 = top right, 3 = bottom left, 4 = bottom right;
 let buttonChoice;
 
@@ -41,7 +48,7 @@ function setup() {
 }
 
 function draw() {
-  background(200);
+  background(225);
   // Menu
   if (state === 0) {
     myMenu.displayBackground();
@@ -51,14 +58,18 @@ function draw() {
   // Trivia
   if (state === 1) {
     myTrivia.isMouseOverButton();
-    if (triviaState === 1) {
+    if (triviaState === 0) {
       myTrivia.displayButtons();
       myTrivia.displayQuestion();
     }
 
-    if (triviaState === 2) {
+    if (triviaState === 1) {
       myTrivia.displayChoice();
     }
+  }
+  // Typing game
+  if (state === 2) {
+    myTypingGame.displayPhrase();
   }
 
 }
@@ -153,7 +164,7 @@ class Trivia {
   }
 
   isMouseOverButton() {
-    if (triviaState === 1) {
+    if (triviaState === 0) {
       // Button one
       if (mouseX >= 160 - this.buttonWidth / 2 && mouseX <= 160 + this.buttonWidth / 2 &&
         mouseY >= 480 - this.buttonHeight / 2 && mouseY <= 480 + this.buttonHeight / 2) {
@@ -190,7 +201,7 @@ class Trivia {
         this.mouseOverButtonFour = false;
       }
     }
-    else if (triviaState === 2) {
+    else if (triviaState === 1) {
       // Next Question button
       if (mouseX >= 320 - this.buttonWidth / 2 && mouseX <= 320 + this.buttonWidth / 2 &&
         mouseY >= 500 - this.buttonHeight / 2 && mouseY <= 500 + this.buttonHeight / 2) {
@@ -226,7 +237,7 @@ class Trivia {
     else if (this.georgeBushHappiness === 2) {
       image(gladBush, 0, 0, 640, 640);
     }
-    else{
+    else {
       image(radBush, 0, 0, 640, 640);
     }
 
@@ -242,13 +253,13 @@ class Trivia {
 
     // Next Question Button
     rectMode(CENTER);
-    fill(0, 0, 255, 95);
+    fill(0, 0, 255, 200);
     if (this.mouseOverNextQuestion) {
-      fill(0, 0, 200, 95);
+      fill(0, 0, 200, 250);
     }
     rect(320, 500, this.buttonWidth, this.buttonHeight);
     fill(0);
-    text("Next Question", 320, 500);
+    text("Next Question", 320, 200);
   }
 
   changeHappiness() {
@@ -262,7 +273,24 @@ class Trivia {
 }
 
 class TypingGame {
+  constructor() {
+    this.speechLevel = 0;
+    this.lives = 10;
+    this.phrase = speeches[this.speechLevel];
+  }
 
+  removeLetters(keyPress) {
+    if (this.phrase[0] === keyPress){
+      this.phrase = pop(this.phrase[0]);
+    }
+  }
+
+  displayPhrase() {
+    textSize(28);
+    rectMode(CORNER);
+    textAlign(LEFT, TOP);
+    text(this.phrase, 0, 0, width, height / 2);
+  }
 }
 
 class Menu {
@@ -305,32 +333,32 @@ class Menu {
 
 function mousePressed() {
   // Makes buttons clickable in trivia game
-  if (state === 1 && triviaState === 1) {
+  if (state === 1 && triviaState === 0) {
     if (myTrivia.mouseOverButtonOne) {
       myTrivia.buttonChoice = 1;
       myTrivia.changeHappiness();
-      triviaState = 2;
+      triviaState = 1;
     }
 
     if (myTrivia.mouseOverButtonTwo) {
       myTrivia.buttonChoice = 2;
       myTrivia.changeHappiness();
-      triviaState = 2;
+      triviaState = 1;
     }
 
     if (myTrivia.mouseOverButtonThree) {
       myTrivia.buttonChoice = 3;
       myTrivia.changeHappiness();
-      triviaState = 2;
+      triviaState = 1;
     }
 
     if (myTrivia.mouseOverButtonFour) {
       myTrivia.buttonChoice = 4;
       myTrivia.changeHappiness();
-      triviaState = 2;
+      triviaState = 1;
     }
   }
-  else if (state === 1 && triviaState === 2) {
+  else if (state === 1 && triviaState === 1) {
     if (myTrivia.mouseOverNextQuestion) {
       if (myTrivia.triviaLevel < myTrivia.triviaMaxLevel) {
         myTrivia.triviaLevel += 1;
@@ -338,14 +366,18 @@ function mousePressed() {
       else {
         myTrivia.triviaLevel = 0;
       }
-      triviaState = 1;
+      triviaState = 0;
     }
   }
 
   // Makes button clickable on menu
   if (state === 0) {
     if (myMenu.mouseOverButton) {
-      state = 1;
+      state = 2;
     }
   }
+}
+
+function keyPressed(){
+  myTypingGame.removeLetters(key);
 }
