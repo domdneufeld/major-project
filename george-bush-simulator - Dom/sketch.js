@@ -1,7 +1,11 @@
 let triviaQuestions = [
   ["Rarely is the question asked, is our _____?", "Children Learning?", "Flag the coolest?", "Our country great?", "Neighbors sneaking?", 1, 0, 0, 0],
   ["Our enemies are innovative and resourceful, and so are we. They never stop thinking about new ways to harm our country and our people, _____.", "And frankly that’s just plain old unacceptable.", "But their leader isn’t nearly as handsome. ", "And neither do we.", "And they must be stopped.", 0, 0, 1, 0],
-  [],
+  ["It's time for the human race to _____.", "Band together", "Enter the solar system.", "Evolve", "Beat Cancer", 0, 1, 0, 0],
+  ["I have made good judgments in the past. _____.", "I will made good judgments in the future.", "But I also made mistakes.", "I have made good judgments in the future.", "But once in a while I made great ones.", 0, 0, 1, 0],
+  ["It isn't pollution that's harming the environment,_____.", "It’s the democrats.", "It’s cold outside.", "It’s the Arabs.", "It’s the impurities in our air and water that are doing it.", 0, 0, 0, 1],
+  ["I know the human being and _____ can coexist peacefully.", "Fish", "Cow", "Arabs", "Technology", 1, 0, 0, 0],
+  ["Africa is a ____ that suffers from incredible disease", "Country", "People", "Nation", "City", 0, 0, 1, 0],
 ];
 
 // Images
@@ -23,6 +27,10 @@ let buttonChoice;
 
 function preload() {
   menuBackground = loadImage("images/startScreen.png");
+  angryBush = loadImage("images/angryBush.png");
+  sadBush = loadImage("images/sadBush.png");
+  gladBush = loadImage("images/gladBush.png");
+  radBush = loadImage("images/radBush.png");
 }
 
 function setup() {
@@ -74,6 +82,7 @@ class Trivia {
     this.questiony = 360;
     // chooses the question
     this.triviaLevel = 0;
+    this.triviaMaxLevel = triviaQuestions.length - 1;
     // Counts how many correct answers you got in a row
     this.georgeBushHappiness = 0; //0 = angry, 1 = sad, 2 = glad, 3 = rad
   }
@@ -140,7 +149,7 @@ class Trivia {
     if (triviaQuestions[this.triviaLevel][4].length >= 20) {
       textSize(this.buttonTextSize - 4);
     }
-    text(triviaQuestions[this.triviaLevel][4], 480, 580);
+    text(triviaQuestions[this.triviaLevel][4], 480, 580, this.buttonWidth, this.buttonHeight);
   }
 
   isMouseOverButton() {
@@ -184,7 +193,7 @@ class Trivia {
     else if (triviaState === 2) {
       // Next Question button
       if (mouseX >= 320 - this.buttonWidth / 2 && mouseX <= 320 + this.buttonWidth / 2 &&
-        mouseY >= 400 - this.buttonHeight / 2 && mouseY <= 400 + this.buttonHeight / 2) {
+        mouseY >= 500 - this.buttonHeight / 2 && mouseY <= 500 + this.buttonHeight / 2) {
         this.mouseOverNextQuestion = true;
       }
       else {
@@ -206,27 +215,48 @@ class Trivia {
   }
 
   displayChoice() {
+    // Determines which george bush to show
+    imageMode(CORNER);
+    if (this.georgeBushHappiness === 0) {
+      image(angryBush, 0, 0, 640, 640);
+    }
+    else if (this.georgeBushHappiness === 1) {
+      image(sadBush, 0, 0, 640, 640);
+    }
+    else if (this.georgeBushHappiness === 2) {
+      image(gladBush, 0, 0, 640, 640);
+    }
+    else{
+      image(radBush, 0, 0, 640, 640);
+    }
+
+    // Determines whether to display correct or incorrect
     fill(0);
     textAlign(CENTER, CENTER);
-    text(this.georgeBushHappiness, width / 2, height / 2);
+    if (triviaQuestions[this.triviaLevel][4 + this.buttonChoice] === 1) {
+      text("Correct!", width / 2, 425);
+    }
+    else {
+      text("Incorrect!", width / 2, 425);
+    }
 
     // Next Question Button
     rectMode(CENTER);
-    fill(0, 0, 255);
+    fill(0, 0, 255, 95);
     if (this.mouseOverNextQuestion) {
-      fill(0, 0, 200);
+      fill(0, 0, 200, 95);
     }
-    rect(320, 400, this.buttonWidth, this.buttonHeight);
+    rect(320, 500, this.buttonWidth, this.buttonHeight);
     fill(0);
-    text("Next Question", 320, 400);
+    text("Next Question", 320, 500);
   }
 
-  changeHappiness(){
-    if (triviaQuestions[this.triviaLevel][4 + this.buttonChoice] === 1){
+  changeHappiness() {
+    if (triviaQuestions[this.triviaLevel][4 + this.buttonChoice] === 1) {
       this.georgeBushHappiness += 1;
     }
-    else if (triviaQuestions[this.triviaLevel][4 + this.buttonChoice] === 0 && this.georgeBushHappiness > 0){
-      this.georgeBushHappiness -= 1;
+    else if (triviaQuestions[this.triviaLevel][4 + this.buttonChoice] === 0 && this.georgeBushHappiness > 0) {
+      this.georgeBushHappiness = 0;
     }
   }
 }
@@ -278,28 +308,36 @@ function mousePressed() {
   if (state === 1 && triviaState === 1) {
     if (myTrivia.mouseOverButtonOne) {
       myTrivia.buttonChoice = 1;
-      triviaState = 2;
       myTrivia.changeHappiness();
+      triviaState = 2;
     }
 
     if (myTrivia.mouseOverButtonTwo) {
       myTrivia.buttonChoice = 2;
+      myTrivia.changeHappiness();
       triviaState = 2;
     }
 
     if (myTrivia.mouseOverButtonThree) {
       myTrivia.buttonChoice = 3;
+      myTrivia.changeHappiness();
       triviaState = 2;
     }
 
     if (myTrivia.mouseOverButtonFour) {
       myTrivia.buttonChoice = 4;
+      myTrivia.changeHappiness();
       triviaState = 2;
     }
   }
   else if (state === 1 && triviaState === 2) {
     if (myTrivia.mouseOverNextQuestion) {
-      myTrivia.triviaLevel += 1;
+      if (myTrivia.triviaLevel < myTrivia.triviaMaxLevel) {
+        myTrivia.triviaLevel += 1;
+      }
+      else {
+        myTrivia.triviaLevel = 0;
+      }
       triviaState = 1;
     }
   }
