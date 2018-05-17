@@ -9,7 +9,7 @@ let triviaQuestions = [
 ];
 
 let speeches = [
-  "example phrase."
+  "I believe God wants me to be president. I was chosen by the grace of God to lead at that moment. God told me to strike at al-Qaeda and I struck them, and then he instructed me to strike at Saddam, which I did, and now I am determined to solve the problem in the Middle East."
 ];
 
 // Images
@@ -70,6 +70,7 @@ function draw() {
   // Typing game
   if (state === 2) {
     myTypingGame.displayPhrase();
+    myTypingGame.displayLives();
   }
 
 }
@@ -275,14 +276,24 @@ class Trivia {
 class TypingGame {
   constructor() {
     this.speechLevel = 0;
-    this.lives = 10;
+    this.lives = 15;
     this.phrase = speeches[this.speechLevel];
+    this.firstLetter = this.phrase[0];
   }
 
-  removeLetters(keyPress) {
-    if (this.phrase[0] === keyPress){
-      this.phrase = pop(this.phrase[0]);
-    }
+  removeLetters() {
+    this.phrase = this.phrase.substr(1);
+    this.firstLetter = this.phrase[0];
+  }
+
+  removeLife(){
+    this.lives -= 1;
+  }
+
+  displayLives(){
+    textSize(48);
+    textAlign(LEFT, BOTTOM);
+    text("Lives: " + this.lives, 0, height);
   }
 
   displayPhrase() {
@@ -378,6 +389,28 @@ function mousePressed() {
   }
 }
 
-function keyPressed(){
-  myTypingGame.removeLetters(key);
+function keyPressed() {
+  // Checks if the key pressed is equal to the first letter in the phrase
+  if (key === myTypingGame.firstLetter.toUpperCase() || key === myTypingGame.firstLetter.toLowerCase()) {
+    myTypingGame.removeLetters();
+  }
+
+  // Punctuation doesn't work with the same logic, so it uses keycodes instead
+  else if (keyCode === 190 && myTypingGame.firstLetter === ".") {
+    myTypingGame.removeLetters();
+  }
+
+  else if (keyCode === 188 && myTypingGame.firstLetter === ",") {
+    myTypingGame.removeLetters();
+  }
+
+  else if (keyCode === 191 && myTypingGame.firstLetter === "?") {
+    myTypingGame.removeLetters();
+  }
+
+  // Removes a life if the wrong button is pressed
+  else{
+    myTypingGame.removeLife();
+  }
+
 }
