@@ -27,7 +27,7 @@ let myTypingGame;
 // State variables
 let state = 0; //state 0 = menu, state 1 = trivia, state 2 = typing
 let triviaState = 0; //state 0 = question, state 1 = feedback/next question menu
-let typingState = 0; //state 0 = game,
+let typingState = 0; //state 0 = game, state 1 = end screen
 
 //Variable for trivia game: 1 = top left 2 = top right, 3 = bottom left, 4 = bottom right;
 let buttonChoice;
@@ -55,6 +55,7 @@ function draw() {
     myMenu.displayStartButton();
     myMenu.isMouseOverButton();
   }
+
   // Trivia
   if (state === 1) {
     myTrivia.isMouseOverButton();
@@ -65,12 +66,21 @@ function draw() {
 
     if (triviaState === 1) {
       myTrivia.displayChoice();
+      myTrivia.isMouseOverButton();
     }
   }
+
   // Typing game
   if (state === 2) {
-    myTypingGame.displayPhrase();
-    myTypingGame.displayLives();
+    if (typingState === 0) {
+      myTypingGame.displayPhrase();
+      myTypingGame.displayLives();
+    }
+
+    else if (typingState === 1) {
+      myTypingGame.displayEndScreen();
+      myTypingGame.isMouseOverButton();
+    }
   }
 
 }
@@ -260,7 +270,7 @@ class Trivia {
     }
     rect(320, 500, this.buttonWidth, this.buttonHeight);
     fill(0);
-    text("Next Question", 320, 200);
+    text("Next Question", 320, 500);
   }
 
   changeHappiness() {
@@ -279,6 +289,11 @@ class TypingGame {
     this.lives = 15;
     this.phrase = speeches[this.speechLevel];
     this.firstLetter = this.phrase[0];
+    this.win = false;
+
+    this.buttonWidth = 300;
+    this.buttonHeight = 80;
+    this.mouseOverButton = false;
   }
 
   removeLetters() {
@@ -286,11 +301,18 @@ class TypingGame {
     this.firstLetter = this.phrase[0];
   }
 
-  removeLife(){
-    this.lives -= 1;
+  removeLife() {
+    if (state === 2 && typingState === 0) {
+      if (this.lives > 1) {
+        this.lives -= 1;
+      }
+      else {
+        typingState = 1;
+      }
+    }
   }
 
-  displayLives(){
+  displayLives() {
     textSize(48);
     textAlign(LEFT, BOTTOM);
     text("Lives: " + this.lives, 0, height);
@@ -301,6 +323,46 @@ class TypingGame {
     rectMode(CORNER);
     textAlign(LEFT, TOP);
     text(this.phrase, 0, 0, width, height / 2);
+  }
+
+  displayEndScreen() {
+    if (this.win) {
+      // Next Game Button
+      textAlign(CENTER, CENTER);
+      textSize(32);
+      rectMode(CENTER);
+      fill(0, 0, 255, 200);
+      if (this.mouseOverButton) {
+        fill(0, 0, 200, 250);
+      }
+      rect(320, 500, this.buttonWidth, this.buttonHeight);
+      fill(0);
+      text("Continue", 320, 500);
+    }
+
+    else {
+      // Try Again Button
+      textAlign(CENTER, CENTER);
+      textSize(32);
+      rectMode(CENTER);
+      fill(0, 0, 255, 200);
+      if (this.mouseOverButton) {
+        fill(0, 0, 200, 250);
+      }
+      rect(320, 500, this.buttonWidth, this.buttonHeight);
+      fill(0);
+      text("Try Again", 320, 500);
+    }
+  }
+
+  isMouseOverButton() {
+    if (mouseX >= 320 - this.buttonWidth / 2 && mouseX <= 320 + this.buttonWidth / 2 &&
+      mouseY >= 500 - this.buttonHeight / 2 && mouseY <= 500 + this.buttonHeight / 2) {
+      this.mouseOverButton = true;
+    }
+    else {
+      this.mouseOverButton = false;
+    }
   }
 }
 
@@ -369,6 +431,7 @@ function mousePressed() {
       triviaState = 1;
     }
   }
+
   else if (state === 1 && triviaState === 1) {
     if (myTrivia.mouseOverNextQuestion) {
       if (myTrivia.triviaLevel < myTrivia.triviaMaxLevel) {
@@ -378,6 +441,20 @@ function mousePressed() {
         myTrivia.triviaLevel = 0;
       }
       triviaState = 0;
+    }
+  }
+
+  if (state === 2 && typingState === 1) {
+    if (myTypingGame.mouseOverButton) {
+      if (myTypingGame.win) {
+        state = 0;
+      }
+      else {
+        typingState = 0;
+        myTypingGame.lives = 15;
+        myTypingGame.phrase = speeches[0];
+        myTypingGame.firstLetter = this.phrase[0];
+      }
     }
   }
 
@@ -408,8 +485,12 @@ function keyPressed() {
     myTypingGame.removeLetters();
   }
 
+  else if (keyCode === 189 && myTypingGame.firstLetter === "-") {
+    myTypingGame.removeLetters();
+  }
+
   // Removes a life if the wrong button is pressed
-  else{
+  else {
     myTypingGame.removeLife();
   }
 
