@@ -75,6 +75,7 @@ function draw() {
     if (typingState === 0) {
       myTypingGame.displayPhrase();
       myTypingGame.displayLives();
+      myTypingGame.displayTimer();
     }
 
     else if (typingState === 1) {
@@ -84,6 +85,15 @@ function draw() {
   }
 
 }
+
+
+
+
+
+
+
+
+
 
 class Trivia {
   constructor() {
@@ -283,6 +293,16 @@ class Trivia {
   }
 }
 
+
+
+
+
+
+
+
+
+
+
 class TypingGame {
   constructor() {
     this.speechLevel = 0;
@@ -294,6 +314,9 @@ class TypingGame {
     this.buttonWidth = 300;
     this.buttonHeight = 80;
     this.mouseOverButton = false;
+
+    this.timeRemaining;
+    this.typingTimer = new Timer;
   }
 
   removeLetters() {
@@ -309,6 +332,21 @@ class TypingGame {
       else {
         typingState = 1;
       }
+    }
+  }
+
+  createTimer(waitTime) {
+    this.typingTimer.reset(waitTime);
+  }
+
+  displayTimer() {
+    this.timeRemaining = (this.typingTimer.waitTime - (millis() - this.typingTimer.startTime)) / 1000;
+    textAlign(RIGHT, BOTTOM);
+    textSize(48);
+    text("Time left: " + floor(this.timeRemaining), width, height);
+
+    if (this.timeRemaining < 1){
+      typingState = 1;
     }
   }
 
@@ -366,6 +404,16 @@ class TypingGame {
   }
 }
 
+
+
+
+
+
+
+
+
+
+
 class Menu {
   constructor() {
     // Button variables
@@ -403,6 +451,52 @@ class Menu {
     }
   }
 }
+
+
+
+
+
+
+
+
+
+
+class Timer {
+  constructor(waitTime) {
+    this.waitTime = waitTime;
+    this.startTime = millis();
+    this.finishTime = this.startTime + this.waitTime;
+    this.timerIsDone = false;
+  }
+
+  reset(newWaitTime) {
+    this.waitTime = newWaitTime;
+    this.startTime = millis();
+    this.finishTime = this.startTime + this.waitTime;
+    this.timerIsDone = false;
+  }
+
+  isDone() {
+    if (millis() >= this.finishTime) {
+      return true;
+    }
+    else {
+      return false;
+    }
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
 
 function mousePressed() {
   // Makes buttons clickable in trivia game
@@ -451,6 +545,7 @@ function mousePressed() {
       }
       else {
         typingState = 0;
+        myTypingGame.createTimer(60000);
         myTypingGame.lives = 15;
         myTypingGame.phrase = speeches[0];
         myTypingGame.firstLetter = this.phrase[0];
@@ -462,11 +557,24 @@ function mousePressed() {
   if (state === 0) {
     if (myMenu.mouseOverButton) {
       state = 2;
+      myTypingGame.createTimer(5000);
     }
   }
 }
 
+
+
+
+
+
+
+
+
+
+
+
 function keyPressed() {
+  // Typing game
   // Checks if the key pressed is equal to the first letter in the phrase
   if (key === myTypingGame.firstLetter.toUpperCase() || key === myTypingGame.firstLetter.toLowerCase()) {
     myTypingGame.removeLetters();
@@ -493,5 +601,4 @@ function keyPressed() {
   else {
     myTypingGame.removeLife();
   }
-
 }
