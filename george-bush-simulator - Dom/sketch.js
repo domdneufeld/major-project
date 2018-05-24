@@ -39,7 +39,7 @@ function preload() {
   sadBush = loadImage("images/sadBush.png");
   gladBush = loadImage("images/gladBush.png");
   radBush = loadImage("images/radBush.png");
-  talkingBush = loadGif("images/talkingBush.gif");
+  talkingBush = loadImage("images/talkingBush.gif");
 }
 
 function setup() {
@@ -381,7 +381,8 @@ class TypingGame {
   }
 
   displayBackground(){
-
+    imageMode(CORNER);
+    image(talkingBush,0 , 0);
   }
 
   displayEndScreen() {
@@ -444,7 +445,7 @@ class Menu {
   }
 
   displayBackground() {
-    image(menuBackground, 0, 0);
+    image(talkingBush, 0, 0);
   }
 
   displayStartButton() {
