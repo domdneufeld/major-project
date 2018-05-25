@@ -20,6 +20,9 @@ let gladBush;
 let radBush;
 let talkingBush; //Typing game background
 
+// Gifs
+let talkingGif;
+
 // Classes
 let myTrivia;
 let myMenu;
@@ -39,7 +42,7 @@ function preload() {
   sadBush = loadImage("images/sadBush.png");
   gladBush = loadImage("images/gladBush.png");
   radBush = loadImage("images/radBush.png");
-  talkingBush = loadImage("images/talkingBush.gif");
+  talkingBush = [loadImage("images/BushTalkParts/bushTalk1.png"), loadImage("images/BushTalkParts/bushTalk2.png")];
 }
 
 function setup() {
@@ -47,6 +50,10 @@ function setup() {
   myTrivia = new Trivia;
   myTypingGame = new TypingGame;
   myMenu = new Menu;
+
+  // Animations
+  talkingGif = new Gif(200, talkingBush);
+
 }
 
 function draw() {
@@ -93,7 +100,30 @@ function draw() {
 
 
 
+class Gif {
+  constructor(timePerImage, image) {
+    this.gifSpeed = timePerImage;
+    this.gif = image;
+    this.gifLength = image.length - 1;
+    this.currentImage = 0;
+    this.gifTimer = new Timer(this.gifSpeed);
+  }
 
+  displayGif() {
+    image(this.gif[this.currentImage], 0, 0);
+    this.gifTimer.timerIsDone = this.gifTimer.isDone();
+    if (this.gifTimer.timerIsDone && this.currentImage < this.gifLength) {
+      this.currentImage += 1;
+      this.gifTimer.reset(this.gifSpeed);
+    }
+    else if (this.gifTimer.timerIsDone) {
+      this.currentImage = 0;
+      this.gifTimer.reset(this.gifSpeed);
+    }
+  }
+
+
+}
 
 
 
@@ -252,10 +282,10 @@ class Trivia {
     text(triviaQuestions[this.triviaLevel][0], this.questionx - this.questionWidth / 2 + 4, this.questiony - this.questionHeight / 2, this.questionWidth, this.questionHeight);
   }
 
-  displayLives(){
-    textAlign(LEFT,TOP);
+  displayLives() {
+    textAlign(LEFT, TOP);
     textSize(24);
-    text("Lives:" + this.lives,0,0);
+    text("Lives:" + this.lives, 0, 0);
   }
 
   displayChoice() {
@@ -300,13 +330,11 @@ class Trivia {
       this.georgeBushHappiness += 1;
     }
     else if (triviaQuestions[this.triviaLevel][4 + this.buttonChoice] === 0) {
-      this.lives-=1;
+      this.lives -= 1;
       this.georgeBushHappiness = 0;
     }
   }
 }
-
-
 
 
 
@@ -335,7 +363,7 @@ class TypingGame {
   removeLetters() {
     this.phrase = this.phrase.substr(1);
     this.firstLetter = this.phrase[0];
-    if (this.phrase.length === 0){
+    if (this.phrase.length === 0) {
       this.win = true;
       typingState = 1;
     }
@@ -362,7 +390,7 @@ class TypingGame {
     textSize(48);
     text("Time left: " + floor(this.timeRemaining), width, height);
 
-    if (this.timeRemaining < 1){
+    if (this.timeRemaining < 1) {
       typingState = 1;
     }
   }
@@ -380,9 +408,9 @@ class TypingGame {
     text(this.phrase, 0, 0, width, height / 2);
   }
 
-  displayBackground(){
+  displayBackground() {
     imageMode(CORNER);
-    image(talkingBush,0 , 0);
+    talkingGif.displayGif();
   }
 
   displayEndScreen() {
@@ -434,8 +462,6 @@ class TypingGame {
 
 
 
-
-
 class Menu {
   constructor() {
     // Button variables
@@ -445,7 +471,7 @@ class Menu {
   }
 
   displayBackground() {
-    image(talkingBush, 0, 0);
+    image(menuBackground, 0, 0);
   }
 
   displayStartButton() {
@@ -482,7 +508,6 @@ class Menu {
 
 
 
-
 class Timer {
   constructor(waitTime) {
     this.waitTime = waitTime;
@@ -507,10 +532,6 @@ class Timer {
     }
   }
 }
-
-
-
-
 
 
 
@@ -585,9 +606,6 @@ function mousePressed() {
     }
   }
 }
-
-
-
 
 
 
