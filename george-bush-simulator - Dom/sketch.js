@@ -18,6 +18,7 @@ let angryBush; // radBush > gladBush > sadBush > angryBush
 let sadBush;
 let gladBush;
 let radBush;
+let talkingBush; //Typing game background
 
 // Classes
 let myTrivia;
@@ -38,6 +39,7 @@ function preload() {
   sadBush = loadImage("images/sadBush.png");
   gladBush = loadImage("images/gladBush.png");
   radBush = loadImage("images/radBush.png");
+  talkingBush = loadImage("images/talkingBush.gif");
 }
 
 function setup() {
@@ -62,6 +64,7 @@ function draw() {
     if (triviaState === 0) {
       myTrivia.displayButtons();
       myTrivia.displayQuestion();
+      myTrivia.displayLives();
     }
 
     if (triviaState === 1) {
@@ -73,6 +76,7 @@ function draw() {
   // Typing game
   if (state === 2) {
     if (typingState === 0) {
+      myTypingGame.displayBackground();
       myTypingGame.displayPhrase();
       myTypingGame.displayLives();
       myTypingGame.displayTimer();
@@ -117,6 +121,8 @@ class Trivia {
     this.triviaMaxLevel = triviaQuestions.length - 1;
     // Counts how many correct answers you got in a row
     this.georgeBushHappiness = 0; //0 = angry, 1 = sad, 2 = glad, 3 = rad
+    // Life count
+    this.lives = 3;
   }
 
   displayButtons() {
@@ -246,6 +252,12 @@ class Trivia {
     text(triviaQuestions[this.triviaLevel][0], this.questionx - this.questionWidth / 2 + 4, this.questiony - this.questionHeight / 2, this.questionWidth, this.questionHeight);
   }
 
+  displayLives(){
+    textAlign(LEFT,TOP);
+    textSize(24);
+    text("Lives:" + this.lives,0,0);
+  }
+
   displayChoice() {
     // Determines which george bush to show
     imageMode(CORNER);
@@ -287,7 +299,8 @@ class Trivia {
     if (triviaQuestions[this.triviaLevel][4 + this.buttonChoice] === 1) {
       this.georgeBushHappiness += 1;
     }
-    else if (triviaQuestions[this.triviaLevel][4 + this.buttonChoice] === 0 && this.georgeBushHappiness > 0) {
+    else if (triviaQuestions[this.triviaLevel][4 + this.buttonChoice] === 0) {
+      this.lives-=1;
       this.georgeBushHappiness = 0;
     }
   }
@@ -322,6 +335,10 @@ class TypingGame {
   removeLetters() {
     this.phrase = this.phrase.substr(1);
     this.firstLetter = this.phrase[0];
+    if (this.phrase.length === 0){
+      this.win = true;
+      typingState = 1;
+    }
   }
 
   removeLife() {
@@ -361,6 +378,11 @@ class TypingGame {
     rectMode(CORNER);
     textAlign(LEFT, TOP);
     text(this.phrase, 0, 0, width, height / 2);
+  }
+
+  displayBackground(){
+    imageMode(CORNER);
+    image(talkingBush,0 , 0);
   }
 
   displayEndScreen() {
@@ -423,7 +445,7 @@ class Menu {
   }
 
   displayBackground() {
-    image(menuBackground, 0, 0);
+    image(talkingBush, 0, 0);
   }
 
   displayStartButton() {
@@ -531,24 +553,26 @@ function mousePressed() {
       if (myTrivia.triviaLevel < myTrivia.triviaMaxLevel) {
         myTrivia.triviaLevel += 1;
       }
-      else {
-        myTrivia.triviaLevel = 0;
+      else if (myTrivia.lives > 0) {
+        state = 2;
       }
       triviaState = 0;
     }
   }
 
+  // Button on end screen of typing game
   if (state === 2 && typingState === 1) {
     if (myTypingGame.mouseOverButton) {
       if (myTypingGame.win) {
         state = 0;
       }
       else {
-        typingState = 0;
-        myTypingGame.createTimer(60000);
+        myTypingGame.createTimer(90000);
         myTypingGame.lives = 15;
         myTypingGame.phrase = speeches[0];
+        typingState = 0;
         myTypingGame.firstLetter = this.phrase[0];
+
       }
     }
   }
@@ -556,8 +580,8 @@ function mousePressed() {
   // Makes button clickable on menu
   if (state === 0) {
     if (myMenu.mouseOverButton) {
-      state = 2;
-      myTypingGame.createTimer(5000);
+      state = 1;
+      myTypingGame.createTimer(90000);
     }
   }
 }
