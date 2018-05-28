@@ -19,9 +19,11 @@ let sadBush;
 let gladBush;
 let radBush;
 let talkingBush; //Typing game background
+let shoeThrowHit; //Typing game possible end screen
 
 // Gifs
 let talkingGif;
+let shoeHit;
 
 // Classes
 let myTrivia;
@@ -43,6 +45,12 @@ function preload() {
   gladBush = loadImage("images/gladBush.png");
   radBush = loadImage("images/radBush.png");
   talkingBush = [loadImage("images/BushTalkParts/bushTalk1.png"), loadImage("images/BushTalkParts/bushTalk2.png")];
+  shoeThrowHit = [loadImage("images/ShoedParts/Shoe1.png"), loadImage("images/ShoedParts/Shoe2.png"), loadImage("images/ShoedParts/Shoe3.png"),
+    loadImage("images/ShoedParts/Shoe4.png"), loadImage("images/ShoedParts/Shoe5.png"), loadImage("images/ShoedParts/Shoe6.png"),
+    loadImage("images/ShoedParts/Shoe7.png"), loadImage("images/ShoedParts/Shoe8.png"), loadImage("images/ShoedParts/Shoe9.png"),
+    loadImage("images/ShoedParts/Shoe10.png"), loadImage("images/ShoedParts/Shoe11.png"), loadImage("images/ShoedParts/Shoe11.png"),
+    loadImage("images/ShoedParts/Shoe11.png"), loadImage("images/ShoedParts/Shoe11.png"),
+  ];
 }
 
 function setup() {
@@ -53,16 +61,14 @@ function setup() {
 
   // Animations
   talkingGif = new Gif(200, talkingBush);
-
+  shoeHit = new Gif(60, shoeThrowHit);
 }
 
 function draw() {
   background(225);
   // Menu
   if (state === 0) {
-    myMenu.displayBackground();
-    myMenu.displayStartButton();
-    myMenu.isMouseOverButton();
+    myMenu.displayMenu();
   }
 
   // Trivia
@@ -97,7 +103,35 @@ function draw() {
 
 }
 
+class Button {
+  constructor(x, y, width, height, string){
+    this.buttonX = x;
+    this.buttonY = y;
+    this.buttonWidth = width;
+    this.buttonHeight = height;
+    this.buttonText = string;
+    this.mouseOverButton = false;
+  }
 
+  displayButton() {
+    rectMode(CENTER);
+    textAlign(CENTER,CENTER);
+    rect(this.buttonX, this.buttonY, this.buttonWidth, this.buttonHeight);
+    fill(0);
+    text(this.buttonText, this.buttonX, this.buttonY);
+  }
+
+  isMouseOverButton() {
+    if (mouseX < this.buttonX + this.buttonWidth / 2 && mouseX > this.buttonX - this.buttonWidth / 2 &&
+    mouseY < this.buttonY + this.buttonHeight / 2 && mouseY > this.buttonY - this.buttonHeight / 2){
+      this.mouseOverButton = true;
+    }
+
+    else{
+      this.mouseOverButton = false;
+    }
+  }
+}
 
 
 class Gif {
@@ -121,8 +155,6 @@ class Gif {
       this.gifTimer.reset(this.gifSpeed);
     }
   }
-
-
 }
 
 
@@ -141,6 +173,8 @@ class Trivia {
     this.mouseOverNextQuestion = false;
     this.buttonTextSize = 24;
     this.buttonChoice = 0;
+
+    this.nextQuestionButton = new Button(320, 500, 300, 80, "Next Question");
     // question variables
     this.questionWidth = 620;
     this.questionHeight = 120;
@@ -315,14 +349,14 @@ class Trivia {
     }
 
     // Next Question Button
-    rectMode(CENTER);
+
+    // rectMode(CENTER);
+    this.nextQuestionButton.isMouseOverButton();
     fill(0, 0, 255, 200);
-    if (this.mouseOverNextQuestion) {
+    if (this.nextQuestionButton.mouseOverButton) {
       fill(0, 0, 200, 250);
     }
-    rect(320, 500, this.buttonWidth, this.buttonHeight);
-    fill(0);
-    text("Next Question", 320, 500);
+    this.nextQuestionButton.displayButton();
   }
 
   changeHappiness() {
@@ -387,8 +421,8 @@ class TypingGame {
   displayTimer() {
     this.timeRemaining = (this.typingTimer.waitTime - (millis() - this.typingTimer.startTime)) / 1000;
     textAlign(RIGHT, BOTTOM);
-    textSize(48);
-    text("Time left: " + floor(this.timeRemaining), width, height);
+    textSize(36);
+    text("Time left: " + floor(this.timeRemaining), width, height - 240);
 
     if (this.timeRemaining < 1) {
       typingState = 1;
@@ -396,9 +430,9 @@ class TypingGame {
   }
 
   displayLives() {
-    textSize(48);
+    textSize(36);
     textAlign(LEFT, BOTTOM);
-    text("Lives: " + this.lives, 0, height);
+    text("Lives: " + this.lives, 0, height - 240);
   }
 
   displayPhrase() {
@@ -414,6 +448,8 @@ class TypingGame {
   }
 
   displayEndScreen() {
+    imageMode(CORNER);
+    shoeHit.displayGif();
     if (this.win) {
       // Next Game Button
       textAlign(CENTER, CENTER);
@@ -423,9 +459,9 @@ class TypingGame {
       if (this.mouseOverButton) {
         fill(0, 0, 200, 250);
       }
-      rect(320, 500, this.buttonWidth, this.buttonHeight);
+      rect(320, 160, this.buttonWidth, this.buttonHeight);
       fill(0);
-      text("Continue", 320, 500);
+      text("Continue", 320, 160);
     }
 
     else {
@@ -437,15 +473,15 @@ class TypingGame {
       if (this.mouseOverButton) {
         fill(0, 0, 200, 250);
       }
-      rect(320, 500, this.buttonWidth, this.buttonHeight);
+      rect(320, 160, this.buttonWidth, this.buttonHeight);
       fill(0);
-      text("Try Again", 320, 500);
+      text("Try Again", 320, 160);
     }
   }
 
   isMouseOverButton() {
     if (mouseX >= 320 - this.buttonWidth / 2 && mouseX <= 320 + this.buttonWidth / 2 &&
-      mouseY >= 500 - this.buttonHeight / 2 && mouseY <= 500 + this.buttonHeight / 2) {
+      mouseY >= 160 - this.buttonHeight / 2 && mouseY <= 160 + this.buttonHeight / 2) {
       this.mouseOverButton = true;
     }
     else {
@@ -464,39 +500,21 @@ class TypingGame {
 
 class Menu {
   constructor() {
-    // Button variables
-    this.buttonWidth = 300;
-    this.buttonHeight = 150;
-    this.mouseOverButton = false;
+    // Creates button
+    this.menuButton = new Button(430, 200, 300, 150, "Start Game");
   }
 
-  displayBackground() {
+  displayMenu() {
     image(menuBackground, 0, 0);
-  }
+    this.menuButton.isMouseOverButton();
 
-  displayStartButton() {
-    fill(0, 0, 255);
-    if (this.mouseOverButton) {
-      fill(0, 0, 200);
-    }
-    stroke(4);
-    rectMode(CENTER);
-    rect(430, 200, this.buttonWidth, this.buttonHeight);
-
-    fill(0);
     textSize(48);
-    textAlign(CENTER, CENTER);
-    text("Start Game", 430, 200);
-  }
+    fill(0,0,255);
+    if (this.menuButton.mouseOverButton){
+      fill(0,0,200);
+    }
 
-  isMouseOverButton() {
-    if (mouseX >= 430 - this.buttonWidth / 2 && mouseX <= 430 + this.buttonWidth / 2 &&
-      mouseY >= 200 - this.buttonHeight / 2 && mouseY <= 200 + this.buttonHeight / 2) {
-      this.mouseOverButton = true;
-    }
-    else {
-      this.mouseOverButton = false;
-    }
+    this.menuButton.displayButton();
   }
 }
 
@@ -569,8 +587,9 @@ function mousePressed() {
     }
   }
 
+  // Next question button for trivia
   else if (state === 1 && triviaState === 1) {
-    if (myTrivia.mouseOverNextQuestion) {
+    if (myTrivia.nextQuestionButton.mouseOverButton) {
       if (myTrivia.triviaLevel < myTrivia.triviaMaxLevel) {
         myTrivia.triviaLevel += 1;
       }
@@ -600,7 +619,7 @@ function mousePressed() {
 
   // Makes button clickable on menu
   if (state === 0) {
-    if (myMenu.mouseOverButton) {
+    if (myMenu.menuButton.mouseOverButton) {
       state = 1;
       myTypingGame.createTimer(90000);
     }
