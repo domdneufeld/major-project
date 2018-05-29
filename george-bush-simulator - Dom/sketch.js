@@ -9,7 +9,8 @@ let triviaQuestions = [
 ];
 
 let speeches = [
-  "I believe God wants me to be president. I was chosen by the grace of God to lead at that moment. God told me to strike at al-Qaeda and I struck them, and then he instructed me to strike at Saddam, which I did, and now I am determined to solve the problem in the Middle East."
+  "example"
+  ,"I believe God wants me to be president. I was chosen by the grace of God to lead at that moment. God told me to strike at al-Qaeda and I struck them, and then he instructed me to strike at Saddam, which I did, and now I am determined to solve the problem in the Middle East."
 ];
 
 // Images
@@ -31,7 +32,7 @@ let myMenu;
 let myTypingGame;
 
 // State variables
-let state = 0; //state 0 = menu, state 1 = trivia, state 2 = typing
+let state = 0; //state 0 = menu, state 1 = trivia, state 2 = typing, state 3 = eating game
 let triviaState = 0; //state 0 = question, state 1 = feedback/next question menu
 let typingState = 0; //state 0 = game, state 1 = end screen
 
@@ -73,7 +74,6 @@ function draw() {
 
   // Trivia
   if (state === 1) {
-    myTrivia.isMouseOverButton();
     if (triviaState === 0) {
       myTrivia.displayButtons();
       myTrivia.displayQuestion();
@@ -82,7 +82,6 @@ function draw() {
 
     if (triviaState === 1) {
       myTrivia.displayChoice();
-      myTrivia.isMouseOverButton();
     }
   }
 
@@ -97,10 +96,8 @@ function draw() {
 
     else if (typingState === 1) {
       myTypingGame.displayEndScreen();
-      myTypingGame.isMouseOverButton();
     }
   }
-
 }
 
 class Button {
@@ -118,7 +115,7 @@ class Button {
     textAlign(CENTER,CENTER);
     rect(this.buttonX, this.buttonY, this.buttonWidth, this.buttonHeight);
     fill(0);
-    text(this.buttonText, this.buttonX, this.buttonY);
+    text(this.buttonText, this.buttonX, this.buttonY, this.buttonWidth, this.buttonHeight);
   }
 
   isMouseOverButton() {
@@ -164,145 +161,95 @@ class Gif {
 class Trivia {
   constructor() {
     // button variables
-    this.buttonWidth = 300;
-    this.buttonHeight = 80;
-    this.mouseOverButtonOne = false;
-    this.mouseOverButtonTwo = false;
-    this.mouseOverButtonThree = false;
-    this.mouseOverButtonFour = false;
-    this.mouseOverNextQuestion = false;
     this.buttonTextSize = 24;
     this.buttonChoice = 0;
 
+    // Button between questions
     this.nextQuestionButton = new Button(320, 500, 300, 80, "Next Question");
+
+    // Trivia buttons
+    this.buttonOne = new Button(160, 480, 300, 80, triviaQuestions[0][1]);
+    this.buttonTwo = new Button(480, 480, 300, 80, triviaQuestions[0][2]);
+    this.buttonThree = new Button(160, 580, 300, 80, triviaQuestions[0][3]);
+    this.buttonFour = new Button(480, 580, 300, 80, triviaQuestions[0][4]);
+
     // question variables
     this.questionWidth = 620;
     this.questionHeight = 120;
     this.questionx = width / 2;
     this.questiony = 360;
+
     // chooses the question
     this.triviaLevel = 0;
     this.triviaMaxLevel = triviaQuestions.length - 1;
+
     // Counts how many correct answers you got in a row
     this.georgeBushHappiness = 0; //0 = angry, 1 = sad, 2 = glad, 3 = rad
+
     // Life count
     this.lives = 3;
   }
 
   displayButtons() {
-    rectMode(CENTER);
-    textAlign(CENTER, CENTER);
+    this.buttonOne.isMouseOverButton();
+    this.buttonTwo.isMouseOverButton();
+    this.buttonThree.isMouseOverButton();
+    this.buttonFour.isMouseOverButton();
+
+    this.buttonOne.buttonText = triviaQuestions[this.triviaLevel][1];
+    this.buttonTwo.buttonText = triviaQuestions[this.triviaLevel][2];
+    this.buttonThree.buttonText = triviaQuestions[this.triviaLevel][3];
+    this.buttonFour.buttonText = triviaQuestions[this.triviaLevel][4];
 
     // Top left button == buttonOne
     fill(175, 0, 0);
-    if (this.mouseOverButtonOne) {
+    if (this.buttonOne.mouseOverButton) {
       fill(255, 0, 0);
     }
-    rect(160, 480, this.buttonWidth, this.buttonHeight);
-
-    fill(0);
-    // Makes the text smaller if the string is long
+    // Makes the text fit in button
     textSize(this.buttonTextSize);
-    if (triviaQuestions[this.triviaLevel][1].length >= 25) {
+    if (this.buttonOne.buttonText.length >= 25) {
       textSize(this.buttonTextSize - 4);
     }
-    text(triviaQuestions[this.triviaLevel][1], 160, 480, this.buttonWidth, this.buttonHeight);
+    this.buttonOne.displayButton();
 
     // Top right button == buttonTwo
     fill(175, 0, 0);
-    if (this.mouseOverButtonTwo) {
+    if (this.buttonTwo.mouseOverButton) {
       fill(255, 0, 0);
     }
-    rect(480, 480, this.buttonWidth, this.buttonHeight);
-
-    fill(0);
-    // Makes the text smaller if the string is long
+    // Makes the text fit in button
     textSize(this.buttonTextSize);
-    if (triviaQuestions[this.triviaLevel][2].length >= 25) {
+    if (this.buttonTwo.buttonText.length >= 25) {
       textSize(this.buttonTextSize - 4);
     }
-    text(triviaQuestions[this.triviaLevel][2], 480, 480, this.buttonWidth, this.buttonHeight);
+    this.buttonTwo.displayButton();
 
     // Bottom left button == buttonThree
     fill(175, 0, 0);
-    if (this.mouseOverButtonThree) {
+    if (this.buttonThree.mouseOverButton) {
       fill(255, 0, 0);
     }
-    rect(160, 580, this.buttonWidth, this.buttonHeight);
-
-    fill(0);
-    // Makes the text smaller if the string is long
+    // Makes the text fit in button
     textSize(this.buttonTextSize);
-    if (triviaQuestions[this.triviaLevel][3].length >= 25) {
+    if (this.buttonThree.buttonText.length >= 25) {
       textSize(this.buttonTextSize - 4);
     }
-    text(triviaQuestions[this.triviaLevel][3], 160, 580, this.buttonWidth, this.buttonHeight);
+    this.buttonThree.displayButton();
 
     // Bottom right button == ButtonFour
     fill(175, 0, 0);
-    if (this.mouseOverButtonFour) {
+    if (this.buttonFour.mouseOverButton) {
       fill(255, 0, 0);
     }
-    rect(480, 580, this.buttonWidth, this.buttonHeight);
-
-    fill(0);
-    // Makes the text smaller if the string is long
+    // Makes the text fit in button
     textSize(this.buttonTextSize);
-    if (triviaQuestions[this.triviaLevel][4].length >= 20) {
+    if (this.buttonFour.buttonText.length >= 25) {
       textSize(this.buttonTextSize - 4);
     }
-    text(triviaQuestions[this.triviaLevel][4], 480, 580, this.buttonWidth, this.buttonHeight);
+    this.buttonFour.displayButton();
   }
 
-  isMouseOverButton() {
-    if (triviaState === 0) {
-      // Button one
-      if (mouseX >= 160 - this.buttonWidth / 2 && mouseX <= 160 + this.buttonWidth / 2 &&
-        mouseY >= 480 - this.buttonHeight / 2 && mouseY <= 480 + this.buttonHeight / 2) {
-        this.mouseOverButtonOne = true;
-      }
-      else {
-        this.mouseOverButtonOne = false;
-      }
-
-      // Button two
-      if (mouseX >= 480 - this.buttonWidth / 2 && mouseX <= 480 + this.buttonWidth / 2 &&
-        mouseY >= 480 - this.buttonHeight / 2 && mouseY <= 480 + this.buttonHeight / 2) {
-        this.mouseOverButtonTwo = true;
-      }
-      else {
-        this.mouseOverButtonTwo = false;
-      }
-
-      // Button three
-      if (mouseX >= 160 - this.buttonWidth / 2 && mouseX <= 160 + this.buttonWidth / 2 &&
-        mouseY >= 580 - this.buttonHeight / 2 && mouseY <= 580 + this.buttonHeight / 2) {
-        this.mouseOverButtonThree = true;
-      }
-      else {
-        this.mouseOverButtonThree = false;
-      }
-
-      // Button four
-      if (mouseX >= 480 - this.buttonWidth / 2 && mouseX <= 480 + this.buttonWidth / 2 &&
-        mouseY >= 580 - this.buttonHeight / 2 && mouseY <= 580 + this.buttonHeight / 2) {
-        this.mouseOverButtonFour = true;
-      }
-      else {
-        this.mouseOverButtonFour = false;
-      }
-    }
-    else if (triviaState === 1) {
-      // Next Question button
-      if (mouseX >= 320 - this.buttonWidth / 2 && mouseX <= 320 + this.buttonWidth / 2 &&
-        mouseY >= 500 - this.buttonHeight / 2 && mouseY <= 500 + this.buttonHeight / 2) {
-        this.mouseOverNextQuestion = true;
-      }
-      else {
-        this.mouseOverNextQuestion = false;
-      }
-    }
-  }
 
   displayQuestion() {
     rectMode(CENTER);
@@ -349,8 +296,6 @@ class Trivia {
     }
 
     // Next Question Button
-
-    // rectMode(CENTER);
     this.nextQuestionButton.isMouseOverButton();
     fill(0, 0, 255, 200);
     if (this.nextQuestionButton.mouseOverButton) {
@@ -363,9 +308,15 @@ class Trivia {
     if (triviaQuestions[this.triviaLevel][4 + this.buttonChoice] === 1) {
       this.georgeBushHappiness += 1;
     }
-    else if (triviaQuestions[this.triviaLevel][4 + this.buttonChoice] === 0) {
+    else if (triviaQuestions[this.triviaLevel][4 + this.buttonChoice] === 0 && this.lives > 1) {
       this.lives -= 1;
       this.georgeBushHappiness = 0;
+    }
+    else if (triviaQuestions[this.triviaLevel][4 + this.buttonChoice] === 0){
+      this.lives = 3;
+      this.georgeBushHappiness = 0;
+      this.triviaLevel = 0;
+      this.nextQuestionButton.buttonText = "Try Again";
     }
   }
 }
@@ -386,9 +337,7 @@ class TypingGame {
     this.firstLetter = this.phrase[0];
     this.win = false;
 
-    this.buttonWidth = 300;
-    this.buttonHeight = 80;
-    this.mouseOverButton = false;
+    this.typingButton = new Button(320, 160, 300, 80, "Try Again");
 
     this.timeRemaining;
     this.typingTimer = new Timer;
@@ -449,47 +398,38 @@ class TypingGame {
 
   displayEndScreen() {
     imageMode(CORNER);
+    textSize(32);
     shoeHit.displayGif();
     if (this.win) {
-      // Next Game Button
-      textAlign(CENTER, CENTER);
-      textSize(32);
-      rectMode(CENTER);
-      fill(0, 0, 255, 200);
-      if (this.mouseOverButton) {
-        fill(0, 0, 200, 250);
-      }
-      rect(320, 160, this.buttonWidth, this.buttonHeight);
-      fill(0);
-      text("Continue", 320, 160);
+      this.typingButton.buttonText = "Continue";
     }
 
     else {
-      // Try Again Button
-      textAlign(CENTER, CENTER);
-      textSize(32);
-      rectMode(CENTER);
-      fill(0, 0, 255, 200);
-      if (this.mouseOverButton) {
-        fill(0, 0, 200, 250);
-      }
-      rect(320, 160, this.buttonWidth, this.buttonHeight);
-      fill(0);
-      text("Try Again", 320, 160);
+      this.typingButton.buttonText = "Try Again";
     }
-  }
-
-  isMouseOverButton() {
-    if (mouseX >= 320 - this.buttonWidth / 2 && mouseX <= 320 + this.buttonWidth / 2 &&
-      mouseY >= 160 - this.buttonHeight / 2 && mouseY <= 160 + this.buttonHeight / 2) {
-      this.mouseOverButton = true;
+    fill(0, 0, 255, 200);
+    if (this.typingButton.mouseOverButton) {
+      fill(0, 0, 200, 250);
     }
-    else {
-      this.mouseOverButton = false;
-    }
+    this.typingButton.isMouseOverButton();
+    this.typingButton.displayButton();
   }
 }
 
+
+
+
+
+class EatingGame{
+  constructor(){
+
+  }
+
+  displayTracks(){
+
+
+  }
+}
 
 
 
@@ -562,25 +502,25 @@ class Timer {
 function mousePressed() {
   // Makes buttons clickable in trivia game
   if (state === 1 && triviaState === 0) {
-    if (myTrivia.mouseOverButtonOne) {
+    if (myTrivia.buttonOne.mouseOverButton) {
       myTrivia.buttonChoice = 1;
       myTrivia.changeHappiness();
       triviaState = 1;
     }
 
-    if (myTrivia.mouseOverButtonTwo) {
+    if (myTrivia.buttonTwo.mouseOverButton) {
       myTrivia.buttonChoice = 2;
       myTrivia.changeHappiness();
       triviaState = 1;
     }
 
-    if (myTrivia.mouseOverButtonThree) {
+    if (myTrivia.buttonThree.mouseOverButton) {
       myTrivia.buttonChoice = 3;
       myTrivia.changeHappiness();
       triviaState = 1;
     }
 
-    if (myTrivia.mouseOverButtonFour) {
+    if (myTrivia.buttonFour.mouseOverButton) {
       myTrivia.buttonChoice = 4;
       myTrivia.changeHappiness();
       triviaState = 1;
@@ -595,6 +535,7 @@ function mousePressed() {
       }
       else if (myTrivia.lives > 0) {
         state = 2;
+        myTypingGame.createTimer(90000);
       }
       triviaState = 0;
     }
@@ -602,7 +543,7 @@ function mousePressed() {
 
   // Button on end screen of typing game
   if (state === 2 && typingState === 1) {
-    if (myTypingGame.mouseOverButton) {
+    if (myTypingGame.typingButton.mouseOverButton) {
       if (myTypingGame.win) {
         state = 0;
       }
