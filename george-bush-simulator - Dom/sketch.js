@@ -29,11 +29,13 @@ let shoeHit;
 let myTrivia;
 let myMenu;
 let myTypingGame;
+let myEatingGame;
 
 // State variables
 let state = 0; //state 0 = menu, state 1 = trivia, state 2 = typing, state 3 = eating game
 let triviaState = 0; //state 0 = question, state 1 = feedback/next question menu
 let typingState = 0; //state 0 = game, state 1 = end screen
+let eatingState = 0; //state 0 = game
 
 //Variable for trivia game: 1 = top left 2 = top right, 3 = bottom left, 4 = bottom right;
 let buttonChoice;
@@ -58,6 +60,7 @@ function setup() {
   myTrivia = new Trivia;
   myTypingGame = new TypingGame;
   myMenu = new Menu;
+  myEatingGame = new EatingGame;
 
   // Animations
   talkingGif = new Gif(200, talkingBush);
@@ -95,6 +98,14 @@ function draw() {
 
     else if (typingState === 1) {
       myTypingGame.displayEndScreen();
+    }
+  }
+
+  // Eating game
+  if (state === 3) {
+    if (eatingState === 0) {
+      myEatingGame.displayFallingArrows();
+      myEatingGame.displayTracks();
     }
   }
 }
@@ -160,7 +171,7 @@ class Trivia {
     this.buttonChoice = 0;
 
     // Button between questions
-    this.nextQuestionButton = new Button(320, 500, 300, 80, "Next Question");
+    this.nextQuestionButton = new Button(320, 500, 300, 80, "Continue");
 
     // Trivia buttons
     this.buttonOne = new Button(160, 480, 300, 80, triviaQuestions[0][1]);
@@ -403,18 +414,74 @@ class TypingGame {
   }
 }
 
-// class EatingGame {
-//   constructor() {
-//     this.trackWidth = 64;
-//     this.trackX = 320;
-//   }
-//
-//   displayTracks() {
-//     for (let i = 0; i < 4; i++) {
-//       line(this.trackX,0,this.trackX,height);
-//     }
-//   }
-// }
+class EatingGame {
+  constructor() {
+    // track variables
+    this.trackSize = 64;
+    this.trackX = 320;
+    this.trackY = 480;
+
+    // empty array
+    this.arrowArray = [];
+
+    // arrow speed
+    this.arrowSpeed = 3;
+
+    // Length and speed of game
+    this.amountOfArrows = 20;
+    this.spawnRate = 500;
+
+    // timer
+    this.eatingTimer = new Timer(this.spawnRate);
+  }
+
+  displayTracks() {
+    // Draws vertical lines
+    for (let i = 0; i < 5; i++) {
+      line(this.trackX + this.trackSize * i, 0, this.trackX + this.trackSize * i, height);
+    }
+
+    // Draws horizontal lines
+    for (let i = 0; i < 2; i++) {
+      line(this.trackX, this.trackY + this.trackSize * i, width - this.trackSize, this.trackY + this.trackSize * i);
+    }
+  }
+
+  createArrow() {
+    this.arrowArray.push(new Arrow(floor(random(4)), this.arrowSpeed));
+  }
+
+  displayFallingArrows() {
+    for (let i = 0; i < this.arrowArray.length; i++) {
+      this.arrowArray[i].displayArrow();
+    }
+  }
+
+  controlGame() {
+    for (let i = 0; i < this.amountOfArrows; i++) {
+      this.eatingTimer.reset(this.spawnRate);
+      this.createArrow();
+    }
+  }
+}
+
+class Arrow {
+  constructor(key, speed){
+    this.arrowSize = 64;
+    this.arrowDir = key; // 0 = left, 1 = up, 2 = down, 3 = down
+
+    this.speed = speed;
+    this.y = 0;
+  }
+
+  displayArrow() {
+    rectMode(CORNER);
+    fill(255,0,0);
+    rect(myEatingGame.trackX + myEatingGame.trackSize * this.arrowDir, this.y, myEatingGame.trackSize, myEatingGame.trackSize);
+
+    this.y += this.speed;
+  }
+}
 
 class Menu {
   constructor() {
@@ -523,8 +590,10 @@ function mousePressed() {
   // Makes button clickable on menu
   if (state === 0) {
     if (myMenu.menuButton.mouseOverButton) {
-      state = 1;
+      state = 3;
       myTypingGame.createTimer(90000);
+      myEatingGame.createArrow();
+      myEatingGame.eatingTimer.reset(myEatingGame.spawnRate);
     }
   }
 }
