@@ -104,6 +104,7 @@ function draw() {
   // Eating game
   if (state === 3) {
     if (eatingState === 0) {
+      myEatingGame.controlGame();
       myEatingGame.displayFallingArrows();
       myEatingGame.displayTracks();
     }
@@ -429,7 +430,7 @@ class EatingGame {
 
     // Length and speed of game
     this.amountOfArrows = 20;
-    this.spawnRate = 500;
+    this.spawnRate = 750;
 
     // timer
     this.eatingTimer = new Timer(this.spawnRate);
@@ -445,6 +446,16 @@ class EatingGame {
     for (let i = 0; i < 2; i++) {
       line(this.trackX, this.trackY + this.trackSize * i, width - this.trackSize, this.trackY + this.trackSize * i);
     }
+
+    // Draws left arrow
+    fill(0, 50);
+    triangle(320,512,384,480,384,544);
+    // Draws up arrow
+    triangle(384,544,448,544,416,480);
+    // Draws down arrow
+    triangle(448,480,512,480,480,544);
+    // Draws right arrow
+    triangle(576,512,512,480,512,544);
   }
 
   createArrow() {
@@ -458,9 +469,10 @@ class EatingGame {
   }
 
   controlGame() {
-    for (let i = 0; i < this.amountOfArrows; i++) {
-      this.eatingTimer.reset(this.spawnRate);
+    this.eatingTimer.timerIsDone = this.eatingTimer.isDone();
+    if (this.eatingTimer.timerIsDone){
       this.createArrow();
+      this.eatingTimer.reset(this.spawnRate);
     }
   }
 }
@@ -476,9 +488,24 @@ class Arrow {
 
   displayArrow() {
     rectMode(CORNER);
-    fill(255,0,0);
-    rect(myEatingGame.trackX + myEatingGame.trackSize * this.arrowDir, this.y, myEatingGame.trackSize, myEatingGame.trackSize);
+    // Makes different tracks drop different colours
+    if (this.arrowDir === 0){
+      fill(255,0,0);
+    }
 
+    else if (this.arrowDir === 1){
+      fill(255,0,255);
+    }
+
+    else if (this.arrowDir === 2){
+      fill(0,0,255);
+    }
+
+    else if (this.arrowDir === 3){
+      fill(0,255,0);
+    }
+
+    rect(myEatingGame.trackX + myEatingGame.trackSize * this.arrowDir, this.y, myEatingGame.trackSize, myEatingGame.trackSize);
     this.y += this.speed;
   }
 }
@@ -601,29 +628,79 @@ function mousePressed() {
 function keyPressed() {
   // Typing game
   // Checks if the key pressed is equal to the first letter in the phrase
-  if (key === myTypingGame.firstLetter.toUpperCase() || key === myTypingGame.firstLetter.toLowerCase()) {
-    myTypingGame.removeLetters();
+  if (state === 2){
+    if (key === myTypingGame.firstLetter.toUpperCase() || key === myTypingGame.firstLetter.toLowerCase()) {
+      myTypingGame.removeLetters();
+    }
+
+    // Punctuation doesn't work with the same logic, so it uses keycodes instead
+    else if (keyCode === 190 && myTypingGame.firstLetter === ".") {
+      myTypingGame.removeLetters();
+    }
+
+    else if (keyCode === 188 && myTypingGame.firstLetter === ",") {
+      myTypingGame.removeLetters();
+    }
+
+    else if (keyCode === 191 && myTypingGame.firstLetter === "?") {
+      myTypingGame.removeLetters();
+    }
+
+    else if (keyCode === 189 && myTypingGame.firstLetter === "-") {
+      myTypingGame.removeLetters();
+    }
+
+    // Removes a life if the wrong button is pressed
+    else {
+      myTypingGame.removeLife();
+    }
+
   }
 
-  // Punctuation doesn't work with the same logic, so it uses keycodes instead
-  else if (keyCode === 190 && myTypingGame.firstLetter === ".") {
-    myTypingGame.removeLetters();
-  }
+  //Eating game
+  if (state === 3){
+    if (keyCode === LEFT_ARROW){
+      // Left arrow === 0
+      for (let i = 0; i < myEatingGame.arrowArray.length - 1; i++) {
+        if(myEatingGame.arrowArray[i].arrowDir === 0
+        && myEatingGame.arrowArray[i].y >= myEatingGame.trackY - 32
+        && myEatingGame.arrowArray[i].y <= myEatingGame.trackY + 32){
+          myEatingGame.arrowArray.splice(i, 1);
+        }
+      }
+    }
 
-  else if (keyCode === 188 && myTypingGame.firstLetter === ",") {
-    myTypingGame.removeLetters();
-  }
+    if (keyCode === UP_ARROW){
+      // Up arrow === 1
+      for (let i = 0; i < myEatingGame.arrowArray.length - 1; i++) {
+        if (myEatingGame.arrowArray[i].arrowDir === 1
+        && myEatingGame.arrowArray[i].y >= myEatingGame.trackY - 32
+        && myEatingGame.arrowArray[i].y <= myEatingGame.trackY + 32){
+          myEatingGame.arrowArray.splice(i, 1);
+        }
+      }
+    }
 
-  else if (keyCode === 191 && myTypingGame.firstLetter === "?") {
-    myTypingGame.removeLetters();
-  }
+    if (keyCode === DOWN_ARROW){
+      // Down Arrow === 2
+      for (let i = 0; i < myEatingGame.arrowArray.length - 1; i++) {
+        if (myEatingGame.arrowArray[i].arrowDir === 2
+        && myEatingGame.arrowArray[i].y >= myEatingGame.trackY - 32
+        && myEatingGame.arrowArray[i].y <= myEatingGame.trackY + 32){
+          myEatingGame.arrowArray.splice(i, 1);
+        }
+      }
+    }
 
-  else if (keyCode === 189 && myTypingGame.firstLetter === "-") {
-    myTypingGame.removeLetters();
-  }
-
-  // Removes a life if the wrong button is pressed
-  else {
-    myTypingGame.removeLife();
+    if (keyCode === RIGHT_ARROW){
+      // Right arrow === 3
+      for (let i = 0; i < myEatingGame.arrowArray.length - 1; i++) {
+        if(myEatingGame.arrowArray[i].arrowDir === 3
+        && myEatingGame.arrowArray[i].y >= myEatingGame.trackY - 32
+        && myEatingGame.arrowArray[i].y <= myEatingGame.trackY + 32){
+          myEatingGame.arrowArray.splice(i, 1);
+        }
+      }
+    }
   }
 }
