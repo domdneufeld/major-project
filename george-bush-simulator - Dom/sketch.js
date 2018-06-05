@@ -9,7 +9,7 @@ let triviaQuestions = [
 ];
 
 let speeches = [
-  "example", "I believe God wants me to be president. I was chosen by the grace of God to lead at that moment. God told me to strike at al-Qaeda and I struck them, and then he instructed me to strike at Saddam, which I did, and now I am determined to solve the problem in the Middle East."
+  "I believe God wants me to be president. I was chosen by the grace of God to lead at that moment. God told me to strike at al-Qaeda and I struck them, and then he instructed me to strike at Saddam, which I did, and now I am determined to solve the problem in the Middle East."
 ];
 
 // Images
@@ -35,10 +35,13 @@ let myEatingGame;
 let state = 0; //state 0 = menu, state 1 = trivia, state 2 = typing, state 3 = eating game
 let triviaState = 0; //state 0 = question, state 1 = feedback/next question menu
 let typingState = 0; //state 0 = game, state 1 = end screen
-let eatingState = 0; //state 0 = game
+let eatingState = 0; //state 0 = game, state 1 = win/loss screen
 
-//Variable for trivia game: 1 = top left 2 = top right, 3 = bottom left, 4 = bottom right;
+// Variable for trivia game: 1 = top left 2 = top right, 3 = bottom left, 4 = bottom right;
 let buttonChoice;
+
+// Variable for checking to see if you pressed the key at the wrong time in the eating game
+let eatingCheck;
 
 function preload() {
   menuBackground = loadImage("images/startScreen.png");
@@ -106,7 +109,11 @@ function draw() {
     if (eatingState === 0) {
       myEatingGame.controlGame();
       myEatingGame.displayFallingArrows();
-      myEatingGame.displayTracks();
+      myEatingGame.displayBackground();
+      myEatingGame.removeAtBottom();
+    }
+    else if(eatingState === 1){
+      myEatingGame.displayEndScreen();
     }
   }
 }
@@ -417,6 +424,9 @@ class TypingGame {
 
 class EatingGame {
   constructor() {
+    this.lives = 20;
+    this.win = false;
+
     // track variables
     this.trackSize = 64;
     this.trackX = 320;
@@ -426,17 +436,66 @@ class EatingGame {
     this.arrowArray = [];
 
     // arrow speed
-    this.arrowSpeed = 3;
+    this.arrowSpeed = 5;
 
     // Length and speed of game
     this.amountOfArrows = 20;
-    this.spawnRate = 750;
+    this.spawnRate = 500;
 
     // timer
     this.eatingTimer = new Timer(this.spawnRate);
+
+    // End screen buttonTexts
+    this.winButton = new Button(320, 500, 300, 80, "Continue");
+    this.lossButton = new Button(320, 500, 300, 80, "Try Again");
   }
 
-  displayTracks() {
+  // removes squares once they reach the bottom of the screen
+  removeAtBottom(){
+    if (this.arrowArray[0].y > height){
+      this.arrowArray.splice(0,1);
+      this.removeLife();
+    }
+  }
+
+  displayEndScreen(){
+    imageMode(CORNER);
+    textSize(24);
+    if (this.win){
+      image(gladBush,0,0);
+
+      this.winButton.isMouseOverButton();
+      fill(0,0,200);
+      if (this.winButton.mouseOverButton){
+        fill(0,0,255);
+      }
+
+      this.winButton.displayButton();
+    }
+
+    else{
+      image(sadBush,0,0);
+
+      this.lossButton.isMouseOverButton();
+      fill(0,0,200);
+      if (this.lossButton.mouseOverButton){
+        fill(0,0,255);
+      }
+      this.lossButton.displayButton();
+    }
+  }
+
+  removeLife(){
+    if (this.lives > 1){
+      this.lives -= 1;
+    }
+    else{
+      eatingState = 1;
+      this.win = false;
+    }
+  }
+
+  displayBackground() {
     // Draws vertical lines
     for (let i = 0; i < 5; i++) {
       line(this.trackX + this.trackSize * i, 0, this.trackX + this.trackSize * i, height);
@@ -456,6 +515,12 @@ class EatingGame {
     triangle(448,480,512,480,480,544);
     // Draws right arrow
     triangle(576,512,512,480,512,544);
+
+    // Displays lives
+    textAlign(LEFT,BOTTOM);
+    textSize(20);
+    fill(0);
+    text("Lives: " + this.lives,0,height);
   }
 
   createArrow() {
@@ -601,7 +666,7 @@ function mousePressed() {
   if (state === 2 && typingState === 1) {
     if (myTypingGame.typingButton.mouseOverButton) {
       if (myTypingGame.win) {
-        state = 0;
+        state = 3;
       }
       else {
         myTypingGame.createTimer(90000);
@@ -661,45 +726,65 @@ function keyPressed() {
   if (state === 3){
     if (keyCode === LEFT_ARROW){
       // Left arrow === 0
+      eatingCheck = true;
       for (let i = 0; i < myEatingGame.arrowArray.length - 1; i++) {
         if(myEatingGame.arrowArray[i].arrowDir === 0
-        && myEatingGame.arrowArray[i].y >= myEatingGame.trackY - 32
-        && myEatingGame.arrowArray[i].y <= myEatingGame.trackY + 32){
+        && myEatingGame.arrowArray[i].y >= myEatingGame.trackY - 24
+        && myEatingGame.arrowArray[i].y <= myEatingGame.trackY + 24){
+          eatingCheck = false;
           myEatingGame.arrowArray.splice(i, 1);
         }
+      }
+      if (eatingCheck) {
+        myEatingGame.removeLife();
       }
     }
 
     if (keyCode === UP_ARROW){
       // Up arrow === 1
+      eatingCheck = true;
       for (let i = 0; i < myEatingGame.arrowArray.length - 1; i++) {
         if (myEatingGame.arrowArray[i].arrowDir === 1
-        && myEatingGame.arrowArray[i].y >= myEatingGame.trackY - 32
-        && myEatingGame.arrowArray[i].y <= myEatingGame.trackY + 32){
+        && myEatingGame.arrowArray[i].y >= myEatingGame.trackY - 24
+        && myEatingGame.arrowArray[i].y <= myEatingGame.trackY + 24){
+          eatingCheck = false;
           myEatingGame.arrowArray.splice(i, 1);
         }
+      }
+      if (eatingCheck) {
+        myEatingGame.removeLife();
       }
     }
 
     if (keyCode === DOWN_ARROW){
       // Down Arrow === 2
+      eatingCheck = true;
       for (let i = 0; i < myEatingGame.arrowArray.length - 1; i++) {
         if (myEatingGame.arrowArray[i].arrowDir === 2
-        && myEatingGame.arrowArray[i].y >= myEatingGame.trackY - 32
-        && myEatingGame.arrowArray[i].y <= myEatingGame.trackY + 32){
+        && myEatingGame.arrowArray[i].y >= myEatingGame.trackY - 24
+        && myEatingGame.arrowArray[i].y <= myEatingGame.trackY + 24){
+          eatingCheck = false;
           myEatingGame.arrowArray.splice(i, 1);
         }
+      }
+      if (eatingCheck) {
+        myEatingGame.removeLife();
       }
     }
 
     if (keyCode === RIGHT_ARROW){
       // Right arrow === 3
+      eatingCheck = true;
       for (let i = 0; i < myEatingGame.arrowArray.length - 1; i++) {
         if(myEatingGame.arrowArray[i].arrowDir === 3
-        && myEatingGame.arrowArray[i].y >= myEatingGame.trackY - 32
-        && myEatingGame.arrowArray[i].y <= myEatingGame.trackY + 32){
+        && myEatingGame.arrowArray[i].y >= myEatingGame.trackY - 24
+        && myEatingGame.arrowArray[i].y <= myEatingGame.trackY + 24){
+          eatingCheck = false;
           myEatingGame.arrowArray.splice(i, 1);
         }
+      }
+      if (eatingCheck) {
+        myEatingGame.removeLife();
       }
     }
   }
