@@ -32,7 +32,7 @@ let myTypingGame;
 let myEatingGame;
 
 // State variables
-let state = 0; //state 0 = menu, state 1 = trivia, state 2 = typing, state 3 = eating game
+let state = 0; //state 0 = menu, state 1 = trivia, state 2 = typing, state 3 = eating game, state 4 = level selector
 let triviaState = 0; //state 0 = question, state 1 = feedback/next question menu
 let typingState = 0; //state 0 = game, state 1 = end screen
 let eatingState = 0; //state 0 = game, state 1 = win/loss screen
@@ -111,28 +111,35 @@ function draw() {
       myEatingGame.displayFallingArrows();
       myEatingGame.displayBackground();
       myEatingGame.removeAtBottom();
+      myEatingGame.displayTimer();
     }
     else if (eatingState === 1) {
       myEatingGame.displayEndScreen();
     }
   }
+
+  // Level Selector
+  if (state === 4){
+    myMenu.displayLevelSelect();
+  }
 }
 
 class Button {
-  constructor(x, y, width, height, string) {
+  constructor(x, y, width, height, string, colour) {
     this.buttonX = x;
     this.buttonY = y;
     this.buttonWidth = width;
     this.buttonHeight = height;
     this.buttonText = string;
     this.mouseOverButton = false;
+    this.colour = colour;
   }
 
   displayButton() {
     rectMode(CENTER);
     textAlign(CENTER, CENTER);
     rect(this.buttonX, this.buttonY, this.buttonWidth, this.buttonHeight);
-    fill(0);
+    fill(this.colour);
     text(this.buttonText, this.buttonX, this.buttonY, this.buttonWidth, this.buttonHeight);
   }
 
@@ -179,13 +186,13 @@ class Trivia {
     this.buttonChoice = 0;
 
     // Button between questions
-    this.nextQuestionButton = new Button(320, 500, 300, 80, "Continue");
+    this.nextQuestionButton = new Button(320, 500, 300, 80, "Continue",255);
 
     // Trivia buttons
-    this.buttonOne = new Button(160, 480, 300, 80, triviaQuestions[0][1]);
-    this.buttonTwo = new Button(480, 480, 300, 80, triviaQuestions[0][2]);
-    this.buttonThree = new Button(160, 580, 300, 80, triviaQuestions[0][3]);
-    this.buttonFour = new Button(480, 580, 300, 80, triviaQuestions[0][4]);
+    this.buttonOne = new Button(160, 480, 300, 80, triviaQuestions[0][1],255);
+    this.buttonTwo = new Button(480, 480, 300, 80, triviaQuestions[0][2],255);
+    this.buttonThree = new Button(160, 580, 300, 80, triviaQuestions[0][3],255);
+    this.buttonFour = new Button(480, 580, 300, 80, triviaQuestions[0][4],255);
 
     // question variables
     this.questionWidth = 620;
@@ -273,13 +280,14 @@ class Trivia {
     rectMode(CORNER);
     textSize(this.buttonTextSize);
     textAlign(LEFT, TOP);
-    fill(0);
+    fill(255);
     text(triviaQuestions[this.triviaLevel][0], this.questionx - this.questionWidth / 2 + 4, this.questiony - this.questionHeight / 2, this.questionWidth, this.questionHeight);
   }
 
   displayLives() {
     textAlign(LEFT, TOP);
     textSize(24);
+    fill(0);
     text("Lives:" + this.lives, 0, 0);
   }
 
@@ -343,7 +351,7 @@ class TypingGame {
     this.firstLetter = this.phrase[0];
     this.win = false;
 
-    this.typingButton = new Button(320, 160, 300, 80, "Try Again");
+    this.typingButton = new Button(320, 160, 300, 80, "Try Again",255);
 
     this.timeRemaining;
     this.typingTimer = new Timer;
@@ -436,15 +444,16 @@ class EatingGame {
     this.arrowArray = [];
 
     // arrow speed
-    this.arrowSpeed = 4;
+    this.arrowSpeed = 5;
 
     // Length and speed of game
-    this.amountOfArrows = 20;
-    this.spawnRate = 750;
+    this.amountOfArrows = 50;
+    this.spawnRate = 600;
 
     // timer
     this.spawnTimer = new Timer(this.spawnRate);
     this.gameTimer = new Timer(this.spawnRate * this.amountOfArrows);
+    this.timeRemaining;
 
 
     // End screen buttonTexts
@@ -488,6 +497,7 @@ class EatingGame {
   }
 
   removeLife() {
+    //Makes sure that you won't have zero lives
     if (this.lives > 1) {
       this.lives -= 1;
     }
@@ -520,7 +530,7 @@ class EatingGame {
 
     // Displays lives
     textAlign(LEFT, BOTTOM);
-    textSize(20);
+    textSize(24);
     fill(0);
     text("Lives: " + this.lives, 0, height);
   }
@@ -534,6 +544,13 @@ class EatingGame {
     for (let i = 0; i < this.arrowArray.length; i++) {
       this.arrowArray[i].displayArrow();
     }
+  }
+
+  displayTimer() {
+    this.timeRemaining = (this.gameTimer.waitTime - (millis() - this.gameTimer.startTime)) / 1000;
+    textAlign(RIGHT, BOTTOM);
+    textSize(24);
+    text("Time left: " + floor(this.timeRemaining), width / 2, height);
   }
 
   controlGame() {
@@ -587,21 +604,55 @@ class Arrow {
 
 class Menu {
   constructor() {
-    // Creates button
-    this.menuButton = new Button(430, 200, 300, 150, "Start Game");
+    // Creates first menu button button
+    this.menuButton = new Button(430, 200, 300, 150, "Select Level",255);
+
+    // Creates the level buttons
+    this.triviaGameButton = new Button(430, 150, 300, 75, "George Bush Knowledge Test", 255);
+    this.typingGameButton = new Button(430, 250, 300, 75, "George Bush Speaking Test", 255);
+    this.eatingGameButton = new Button(430, 350, 300, 75, "George Bush Eating Test", 255);
   }
 
   displayMenu() {
+    // Start Menu
     image(menuBackground, 0, 0);
     this.menuButton.isMouseOverButton();
 
-    textSize(48);
+    textSize(36);
     fill(0, 0, 255);
     if (this.menuButton.mouseOverButton) {
       fill(0, 0, 200);
     }
 
     this.menuButton.displayButton();
+  }
+
+  displayLevelSelect(){
+    // Level select
+    this.typingGameButton.isMouseOverButton();
+    this.triviaGameButton.isMouseOverButton();
+    this.eatingGameButton.isMouseOverButton();
+
+    image(menuBackground, 0, 0);
+
+    textSize(24);
+    fill(0, 0, 255);
+    if (this.eatingGameButton.mouseOverButton) {
+      fill(0, 0, 200);
+    }
+    this.eatingGameButton.displayButton();
+
+    fill(0, 0, 255);
+    if (this.typingGameButton.mouseOverButton) {
+      fill(0, 0, 200);
+    }
+    this.typingGameButton.displayButton();
+
+    fill(0, 0, 255);
+    if (this.triviaGameButton.mouseOverButton) {
+      fill(0, 0, 200);
+    }
+    this.triviaGameButton.displayButton();
   }
 }
 
@@ -705,11 +756,10 @@ function mousePressed() {
   // Makes button clickable on menu
   if (state === 0) {
     if (myMenu.menuButton.mouseOverButton) {
-      state = 3;
+      state = 4;
       myTypingGame.createTimer(90000);
       myEatingGame.createArrow();
       myEatingGame.spawnTimer.reset(myEatingGame.spawnRate);
-      // myEatingGame.spawnTimer.reset(myEatingGame.spawnRate * myEatingGame.amountOfArrows);
     }
   }
 }
@@ -752,6 +802,7 @@ function keyPressed() {
       // Left arrow === 0
       eatingCheck = true;
       for (let i = 0; i < myEatingGame.arrowArray.length - 1; i++) {
+        // since I am spawning two random squares at a time, sometimes they will spawn on top of each other. This checks for that
         if (myEatingGame.arrowArray[i].arrowDir === 0 &&
           myEatingGame.arrowArray[i + 1].arrowDir === 0 &&
           myEatingGame.arrowArray[i].y >= myEatingGame.trackY - 32 &&
@@ -778,7 +829,7 @@ function keyPressed() {
       // Up arrow === 1
       eatingCheck = true;
       for (let i = 0; i < myEatingGame.arrowArray.length - 1; i++) {
-        // since I am spawning two random squares at a time, sometimes they will spawn on top 
+        // since I am spawning two random squares at a time, sometimes they will spawn on top of each other. This checks for that
         if (myEatingGame.arrowArray[i].arrowDir === 1 &&
           myEatingGame.arrowArray[i + 1].arrowDir === 1 &&
           myEatingGame.arrowArray[i].y >= myEatingGame.trackY - 32 &&
@@ -805,6 +856,7 @@ function keyPressed() {
       // Down Arrow === 2
       eatingCheck = true;
       for (let i = 0; i < myEatingGame.arrowArray.length - 1; i++) {
+        // since I am spawning two random squares at a time, sometimes they will spawn on top of each other. This checks for that
         if (myEatingGame.arrowArray[i].arrowDir === 2 &&
           myEatingGame.arrowArray[i + 1].arrowDir === 2 &&
           myEatingGame.arrowArray[i].y >= myEatingGame.trackY - 32 &&
@@ -831,6 +883,7 @@ function keyPressed() {
       // Right arrow === 3
       eatingCheck = true;
       for (let i = 0; i < myEatingGame.arrowArray.length - 1; i++) {
+        // since I am spawning two random squares at a time, sometimes they will spawn on top of each other. This checks for that
         if (myEatingGame.arrowArray[i].arrowDir === 3 &&
           myEatingGame.arrowArray[i + 1].arrowDir === 3 &&
           myEatingGame.arrowArray[i].y >= myEatingGame.trackY - 32 &&
@@ -841,6 +894,7 @@ function keyPressed() {
           myEatingGame.arrowArray.splice(i, 2);
         }
 
+        // checks for a single square
         if (myEatingGame.arrowArray[i].arrowDir === 3 &&
           myEatingGame.arrowArray[i].y >= myEatingGame.trackY - 32 &&
           myEatingGame.arrowArray[i].y <= myEatingGame.trackY + 32) {
