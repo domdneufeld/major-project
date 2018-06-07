@@ -29,19 +29,14 @@ let shoeHit;
 let myTrivia;
 let myMenu;
 let myTypingGame;
-let myEatingGame;
 
 // State variables
 let state = 0; //state 0 = menu, state 1 = trivia, state 2 = typing, state 3 = eating game
 let triviaState = 0; //state 0 = question, state 1 = feedback/next question menu
 let typingState = 0; //state 0 = game, state 1 = end screen
-let eatingState = 0; //state 0 = game, state 1 = win/loss screen
 
-// Variable for trivia game: 1 = top left 2 = top right, 3 = bottom left, 4 = bottom right;
+//Variable for trivia game: 1 = top left 2 = top right, 3 = bottom left, 4 = bottom right;
 let buttonChoice;
-
-// Variable for checking to see if you pressed the key at the wrong time in the eating game
-let eatingCheck;
 
 function preload() {
   menuBackground = loadImage("images/startScreen.png");
@@ -63,7 +58,6 @@ function setup() {
   myTrivia = new Trivia;
   myTypingGame = new TypingGame;
   myMenu = new Menu;
-  myEatingGame = new EatingGame;
 
   // Animations
   talkingGif = new Gif(200, talkingBush);
@@ -101,19 +95,6 @@ function draw() {
 
     else if (typingState === 1) {
       myTypingGame.displayEndScreen();
-    }
-  }
-
-  // Eating game
-  if (state === 3) {
-    if (eatingState === 0) {
-      myEatingGame.controlGame();
-      myEatingGame.displayFallingArrows();
-      myEatingGame.displayBackground();
-      myEatingGame.removeAtBottom();
-    }
-    else if (eatingState === 1) {
-      myEatingGame.displayEndScreen();
     }
   }
 }
@@ -179,7 +160,7 @@ class Trivia {
     this.buttonChoice = 0;
 
     // Button between questions
-    this.nextQuestionButton = new Button(320, 500, 300, 80, "Continue");
+    this.nextQuestionButton = new Button(320, 500, 300, 80, "Next Question");
 
     // Trivia buttons
     this.buttonOne = new Button(160, 480, 300, 80, triviaQuestions[0][1]);
@@ -422,168 +403,18 @@ class TypingGame {
   }
 }
 
-class EatingGame {
-  constructor() {
-    this.lives = 20;
-    this.win = false;
-
-    // track variables
-    this.trackSize = 64;
-    this.trackX = 320;
-    this.trackY = 480;
-
-    // empty array
-    this.arrowArray = [];
-
-    // arrow speed
-    this.arrowSpeed = 4;
-
-    // Length and speed of game
-    this.amountOfArrows = 20;
-    this.spawnRate = 750;
-
-    // timer
-    this.spawnTimer = new Timer(this.spawnRate);
-    this.gameTimer = new Timer(this.spawnRate * this.amountOfArrows);
-
-
-    // End screen buttonTexts
-    this.winButton = new Button(320, 500, 300, 80, "Continue");
-    this.lossButton = new Button(320, 500, 300, 80, "Try Again");
-  }
-
-  // removes squares once they reach the bottom of the screen
-  removeAtBottom() {
-    if (this.arrowArray[0].y > height) {
-      this.arrowArray.splice(0, 1);
-      this.removeLife();
-    }
-  }
-
-  displayEndScreen() {
-    imageMode(CORNER);
-    textSize(24);
-    if (this.win) {
-      image(gladBush, 0, 0);
-
-      this.winButton.isMouseOverButton();
-      fill(0, 0, 200, 200);
-      if (this.winButton.mouseOverButton) {
-        fill(0, 0, 255, 200);
-      }
-
-      this.winButton.displayButton();
-    }
-
-    else {
-      image(sadBush, 0, 0);
-
-      this.lossButton.isMouseOverButton();
-      fill(0, 0, 200, 200);
-      if (this.lossButton.mouseOverButton) {
-        fill(0, 0, 255, 200);
-      }
-      this.lossButton.displayButton();
-    }
-  }
-
-  removeLife() {
-    if (this.lives > 1) {
-      this.lives -= 1;
-    }
-    else {
-      eatingState = 1;
-      this.win = false;
-    }
-  }
-
-  displayBackground() {
-    // Draws vertical lines
-    for (let i = 0; i < 5; i++) {
-      line(this.trackX + this.trackSize * i, 0, this.trackX + this.trackSize * i, height);
-    }
-
-    // Draws horizontal lines
-    for (let i = 0; i < 2; i++) {
-      line(this.trackX, this.trackY + this.trackSize * i, width - this.trackSize, this.trackY + this.trackSize * i);
-    }
-
-    // Draws left arrow
-    fill(0, 50);
-    triangle(320, 512, 384, 480, 384, 544);
-    // Draws up arrow
-    triangle(384, 544, 448, 544, 416, 480);
-    // Draws down arrow
-    triangle(448, 480, 512, 480, 480, 544);
-    // Draws right arrow
-    triangle(576, 512, 512, 480, 512, 544);
-
-    // Displays lives
-    textAlign(LEFT, BOTTOM);
-    textSize(20);
-    fill(0);
-    text("Lives: " + this.lives, 0, height);
-  }
-
-  createArrow() {
-    this.arrowArray.push(new Arrow(floor(random(4)), this.arrowSpeed));
-    this.arrowArray.push(new Arrow(floor(random(4)), this.arrowSpeed));
-  }
-
-  displayFallingArrows() {
-    for (let i = 0; i < this.arrowArray.length; i++) {
-      this.arrowArray[i].displayArrow();
-    }
-  }
-
-  controlGame() {
-    this.spawnTimer.timerIsDone = this.spawnTimer.isDone();
-    this.gameTimer.timerIsDone = this.gameTimer.isDone();
-
-    if (this.spawnTimer.timerIsDone) {
-      this.createArrow();
-      this.spawnTimer.reset(this.spawnRate);
-    }
-
-    if (this.gameTimer.timerIsDone) {
-      this.win = true;
-      eatingState = 1;
-    }
-  }
-}
-
-class Arrow {
-  constructor(key, speed) {
-    this.arrowSize = 64;
-    this.arrowDir = key; // 0 = left, 1 = up, 2 = down, 3 = down
-
-    this.speed = speed;
-    this.y = 0;
-  }
-
-  displayArrow() {
-    rectMode(CORNER);
-    // Makes different tracks drop different colours
-    if (this.arrowDir === 0) {
-      fill(255, 0, 0);
-    }
-
-    else if (this.arrowDir === 1) {
-      fill(255, 0, 255);
-    }
-
-    else if (this.arrowDir === 2) {
-      fill(0, 0, 255);
-    }
-
-    else if (this.arrowDir === 3) {
-      fill(0, 255, 0);
-    }
-
-    rect(myEatingGame.trackX + myEatingGame.trackSize * this.arrowDir, this.y, myEatingGame.trackSize, myEatingGame.trackSize);
-    this.y += this.speed;
-  }
-}
+// class EatingGame {
+//   constructor() {
+//     this.trackWidth = 64;
+//     this.trackX = 320;
+//   }
+//
+//   displayTracks() {
+//     for (let i = 0; i < 4; i++) {
+//       line(this.trackX,0,this.trackX,height);
+//     }
+//   }
+// }
 
 class Menu {
   constructor() {
@@ -676,7 +507,7 @@ function mousePressed() {
   if (state === 2 && typingState === 1) {
     if (myTypingGame.typingButton.mouseOverButton) {
       if (myTypingGame.win) {
-        state = 3;
+        state = 0;
       }
       else {
         myTypingGame.createTimer(90000);
@@ -684,32 +515,16 @@ function mousePressed() {
         myTypingGame.phrase = speeches[0];
         typingState = 0;
         myTypingGame.firstLetter = this.phrase[0];
+
       }
     }
-  }
-
-  // Eating game buttons
-  if (myEatingGame.winButton.mouseOverButton) {
-    state = 0;
-  }
-
-  if (myEatingGame.lossButton.mouseOverButton) {
-    myEatingGame.gameTimer.reset(myEatingGame.spawnRate * myEatingGame.amountOfArrows);
-    myEatingGame.spawnTimer.reset(myEatingGame.spawnRate);
-    myEatingGame.lives = 5;
-    myEatingGame.arrowArray = [];
-    myEatingGame.createArrow();
-    eatingState = 0;
   }
 
   // Makes button clickable on menu
   if (state === 0) {
     if (myMenu.menuButton.mouseOverButton) {
-      state = 3;
+      state = 1;
       myTypingGame.createTimer(90000);
-      myEatingGame.createArrow();
-      myEatingGame.spawnTimer.reset(myEatingGame.spawnRate);
-      // myEatingGame.spawnTimer.reset(myEatingGame.spawnRate * myEatingGame.amountOfArrows);
     }
   }
 }
@@ -717,140 +532,29 @@ function mousePressed() {
 function keyPressed() {
   // Typing game
   // Checks if the key pressed is equal to the first letter in the phrase
-  if (state === 2) {
-    if (key === myTypingGame.firstLetter.toUpperCase() || key === myTypingGame.firstLetter.toLowerCase()) {
-      myTypingGame.removeLetters();
-    }
-
-    // Punctuation doesn't work with the same logic, so it uses keycodes instead
-    else if (keyCode === 190 && myTypingGame.firstLetter === ".") {
-      myTypingGame.removeLetters();
-    }
-
-    else if (keyCode === 188 && myTypingGame.firstLetter === ",") {
-      myTypingGame.removeLetters();
-    }
-
-    else if (keyCode === 191 && myTypingGame.firstLetter === "?") {
-      myTypingGame.removeLetters();
-    }
-
-    else if (keyCode === 189 && myTypingGame.firstLetter === "-") {
-      myTypingGame.removeLetters();
-    }
-
-    // Removes a life if the wrong button is pressed
-    else {
-      myTypingGame.removeLife();
-    }
-
+  if (key === myTypingGame.firstLetter.toUpperCase() || key === myTypingGame.firstLetter.toLowerCase()) {
+    myTypingGame.removeLetters();
   }
 
-  //Eating game
-  if (state === 3) {
-    if (keyCode === LEFT_ARROW) {
-      // Left arrow === 0
-      eatingCheck = true;
-      for (let i = 0; i < myEatingGame.arrowArray.length - 1; i++) {
-        if (myEatingGame.arrowArray[i].arrowDir === 0 &&
-          myEatingGame.arrowArray[i + 1].arrowDir === 0 &&
-          myEatingGame.arrowArray[i].y >= myEatingGame.trackY - 32 &&
-          myEatingGame.arrowArray[i].y <= myEatingGame.trackY + 32 &&
-          myEatingGame.arrowArray[i + 1].y >= myEatingGame.trackY - 32 &&
-          myEatingGame.arrowArray[i + 1].y <= myEatingGame.trackY + 32) {
-          eatingCheck = false;
-          myEatingGame.arrowArray.splice(i, 2);
-        }
+  // Punctuation doesn't work with the same logic, so it uses keycodes instead
+  else if (keyCode === 190 && myTypingGame.firstLetter === ".") {
+    myTypingGame.removeLetters();
+  }
 
-        if (myEatingGame.arrowArray[i].arrowDir === 0 &&
-          myEatingGame.arrowArray[i].y >= myEatingGame.trackY - 32 &&
-          myEatingGame.arrowArray[i].y <= myEatingGame.trackY + 32) {
-          eatingCheck = false;
-          myEatingGame.arrowArray.splice(i, 1);
-        }
-      }
-      if (eatingCheck) {
-        myEatingGame.removeLife();
-      }
-    }
+  else if (keyCode === 188 && myTypingGame.firstLetter === ",") {
+    myTypingGame.removeLetters();
+  }
 
-    if (keyCode === UP_ARROW) {
-      // Up arrow === 1
-      eatingCheck = true;
-      for (let i = 0; i < myEatingGame.arrowArray.length - 1; i++) {
-        // since I am spawning two random squares at a time, sometimes they will spawn on top 
-        if (myEatingGame.arrowArray[i].arrowDir === 1 &&
-          myEatingGame.arrowArray[i + 1].arrowDir === 1 &&
-          myEatingGame.arrowArray[i].y >= myEatingGame.trackY - 32 &&
-          myEatingGame.arrowArray[i].y <= myEatingGame.trackY + 32 &&
-          myEatingGame.arrowArray[i + 1].y >= myEatingGame.trackY - 32 &&
-          myEatingGame.arrowArray[i + 1].y <= myEatingGame.trackY + 32) {
-          eatingCheck = false;
-          myEatingGame.arrowArray.splice(i, 2);
-        }
+  else if (keyCode === 191 && myTypingGame.firstLetter === "?") {
+    myTypingGame.removeLetters();
+  }
 
-        if (myEatingGame.arrowArray[i].arrowDir === 1 &&
-          myEatingGame.arrowArray[i].y >= myEatingGame.trackY - 32 &&
-          myEatingGame.arrowArray[i].y <= myEatingGame.trackY + 32) {
-          eatingCheck = false;
-          myEatingGame.arrowArray.splice(i, 1);
-        }
-      }
-      if (eatingCheck) {
-        myEatingGame.removeLife();
-      }
-    }
+  else if (keyCode === 189 && myTypingGame.firstLetter === "-") {
+    myTypingGame.removeLetters();
+  }
 
-    if (keyCode === DOWN_ARROW) {
-      // Down Arrow === 2
-      eatingCheck = true;
-      for (let i = 0; i < myEatingGame.arrowArray.length - 1; i++) {
-        if (myEatingGame.arrowArray[i].arrowDir === 2 &&
-          myEatingGame.arrowArray[i + 1].arrowDir === 2 &&
-          myEatingGame.arrowArray[i].y >= myEatingGame.trackY - 32 &&
-          myEatingGame.arrowArray[i].y <= myEatingGame.trackY + 32 &&
-          myEatingGame.arrowArray[i + 1].y >= myEatingGame.trackY - 32 &&
-          myEatingGame.arrowArray[i + 1].y <= myEatingGame.trackY + 32) {
-          eatingCheck = false;
-          myEatingGame.arrowArray.splice(i, 2);
-        }
-
-        if (myEatingGame.arrowArray[i].arrowDir === 2 &&
-          myEatingGame.arrowArray[i].y >= myEatingGame.trackY - 32 &&
-          myEatingGame.arrowArray[i].y <= myEatingGame.trackY + 32) {
-          eatingCheck = false;
-          myEatingGame.arrowArray.splice(i, 1);
-        }
-      }
-      if (eatingCheck) {
-        myEatingGame.removeLife();
-      }
-    }
-
-    if (keyCode === RIGHT_ARROW) {
-      // Right arrow === 3
-      eatingCheck = true;
-      for (let i = 0; i < myEatingGame.arrowArray.length - 1; i++) {
-        if (myEatingGame.arrowArray[i].arrowDir === 3 &&
-          myEatingGame.arrowArray[i + 1].arrowDir === 3 &&
-          myEatingGame.arrowArray[i].y >= myEatingGame.trackY - 32 &&
-          myEatingGame.arrowArray[i].y <= myEatingGame.trackY + 32 &&
-          myEatingGame.arrowArray[i + 1].y >= myEatingGame.trackY - 32 &&
-          myEatingGame.arrowArray[i + 1].y <= myEatingGame.trackY + 32) {
-          eatingCheck = false;
-          myEatingGame.arrowArray.splice(i, 2);
-        }
-
-        if (myEatingGame.arrowArray[i].arrowDir === 3 &&
-          myEatingGame.arrowArray[i].y >= myEatingGame.trackY - 32 &&
-          myEatingGame.arrowArray[i].y <= myEatingGame.trackY + 32) {
-          eatingCheck = false;
-          myEatingGame.arrowArray.splice(i, 1);
-        }
-      }
-      if (eatingCheck) {
-        myEatingGame.removeLife();
-      }
-    }
+  // Removes a life if the wrong button is pressed
+  else {
+    myTypingGame.removeLife();
   }
 }
