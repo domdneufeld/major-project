@@ -9,7 +9,7 @@ let triviaQuestions = [
 ];
 
 let speeches = [
-  "I believe God wants me to be president. I was chosen by the grace of God to lead at that moment. God told me to strike at al-Qaeda and I struck them, and then he instructed me to strike at Saddam, which I did, and now I am determined to solve the problem in the Middle East."
+  "a","I believe God wants me to be president. I was chosen by the grace of God to lead at that moment. God told me to strike at al-Qaeda and I struck them, and then he instructed me to strike at Saddam, which I did, and now I am determined to solve the problem in the Middle East."
 ];
 
 // Images
@@ -20,10 +20,13 @@ let gladBush;
 let radBush;
 let talkingBush; //Typing game background
 let shoeThrowHit; //Typing game possible end screen
+let bushEatingPretzel; //eating game background 1
 
 // Gifs
 let talkingGif;
 let shoeHit;
+let pretzelGif;
+
 
 // Classes
 let myTrivia;
@@ -49,6 +52,8 @@ function preload() {
   sadBush = loadImage("images/sadBush.png");
   gladBush = loadImage("images/gladBush.png");
   radBush = loadImage("images/radBush.png");
+
+  // Loads all images in an animation
   talkingBush = [loadImage("images/BushTalkParts/bushTalk1.png"), loadImage("images/BushTalkParts/bushTalk2.png")];
   shoeThrowHit = [loadImage("images/ShoedParts/Shoe1.png"), loadImage("images/ShoedParts/Shoe2.png"), loadImage("images/ShoedParts/Shoe3.png"),
     loadImage("images/ShoedParts/Shoe4.png"), loadImage("images/ShoedParts/Shoe5.png"), loadImage("images/ShoedParts/Shoe6.png"),
@@ -56,6 +61,7 @@ function preload() {
     loadImage("images/ShoedParts/Shoe10.png"), loadImage("images/ShoedParts/Shoe11.png"), loadImage("images/ShoedParts/Shoe11.png"),
     loadImage("images/ShoedParts/Shoe11.png"), loadImage("images/ShoedParts/Shoe11.png"),
   ];
+  bushEatingPretzel = [loadImage("images/bushPretzel/pretzel1.png"), loadImage("images/bushPretzel/pretzel2.png")];
 }
 
 function setup() {
@@ -68,6 +74,7 @@ function setup() {
   // Animations
   talkingGif = new Gif(200, talkingBush);
   shoeHit = new Gif(60, shoeThrowHit);
+  pretzelGif = new Gif(200, bushEatingPretzel);
 }
 
 function draw() {
@@ -78,7 +85,7 @@ function draw() {
   }
 
   // Trivia
-  if (state === 1) {
+  else if (state === 1) {
     if (triviaState === 0) {
       myTrivia.displayButtons();
       myTrivia.displayQuestion();
@@ -91,7 +98,7 @@ function draw() {
   }
 
   // Typing game
-  if (state === 2) {
+  else if (state === 2) {
     if (typingState === 0) {
       myTypingGame.displayBackground();
       myTypingGame.displayPhrase();
@@ -105,11 +112,11 @@ function draw() {
   }
 
   // Eating game
-  if (state === 3) {
+  else if (state === 3) {
     if (eatingState === 0) {
       myEatingGame.controlGame();
-      myEatingGame.displayFallingArrows();
       myEatingGame.displayBackground();
+      myEatingGame.displayFallingArrows();
       myEatingGame.removeAtBottom();
       myEatingGame.displayTimer();
     }
@@ -119,7 +126,7 @@ function draw() {
   }
 
   // Level Selector
-  if (state === 4){
+  else if (state === 4) {
     myMenu.displayLevelSelect();
   }
 }
@@ -165,8 +172,8 @@ class Gif {
     this.gifTimer = new Timer(this.gifSpeed);
   }
 
-  displayGif() {
-    image(this.gif[this.currentImage], 0, 0);
+  displayGif(x, y) {
+    image(this.gif[this.currentImage], x, y);
     this.gifTimer.timerIsDone = this.gifTimer.isDone();
     if (this.gifTimer.timerIsDone && this.currentImage < this.gifLength) {
       this.currentImage += 1;
@@ -186,13 +193,13 @@ class Trivia {
     this.buttonChoice = 0;
 
     // Button between questions
-    this.nextQuestionButton = new Button(320, 500, 300, 80, "Continue",255);
+    this.nextQuestionButton = new Button(320, 500, 300, 80, "Continue", 255);
 
     // Trivia buttons
-    this.buttonOne = new Button(160, 480, 300, 80, triviaQuestions[0][1],255);
-    this.buttonTwo = new Button(480, 480, 300, 80, triviaQuestions[0][2],255);
-    this.buttonThree = new Button(160, 580, 300, 80, triviaQuestions[0][3],255);
-    this.buttonFour = new Button(480, 580, 300, 80, triviaQuestions[0][4],255);
+    this.buttonOne = new Button(160, 480, 300, 80, triviaQuestions[0][1], 255);
+    this.buttonTwo = new Button(480, 480, 300, 80, triviaQuestions[0][2], 255);
+    this.buttonThree = new Button(160, 580, 300, 80, triviaQuestions[0][3], 255);
+    this.buttonFour = new Button(480, 580, 300, 80, triviaQuestions[0][4], 255);
 
     // question variables
     this.questionWidth = 620;
@@ -351,7 +358,7 @@ class TypingGame {
     this.firstLetter = this.phrase[0];
     this.win = false;
 
-    this.typingButton = new Button(320, 160, 300, 80, "Try Again",255);
+    this.typingButton = new Button(320, 160, 300, 80, "Try Again", 255);
 
     this.timeRemaining;
     this.typingTimer = new Timer;
@@ -382,6 +389,7 @@ class TypingGame {
   }
 
   displayTimer() {
+    fill(0);
     this.timeRemaining = (this.typingTimer.waitTime - (millis() - this.typingTimer.startTime)) / 1000;
     textAlign(RIGHT, BOTTOM);
     textSize(36);
@@ -393,12 +401,14 @@ class TypingGame {
   }
 
   displayLives() {
+    fill(0);
     textSize(36);
     textAlign(LEFT, BOTTOM);
     text("Lives: " + this.lives, 0, height - 240);
   }
 
   displayPhrase() {
+    fill(0);
     textSize(28);
     rectMode(CORNER);
     textAlign(LEFT, TOP);
@@ -407,13 +417,13 @@ class TypingGame {
 
   displayBackground() {
     imageMode(CORNER);
-    talkingGif.displayGif();
+    talkingGif.displayGif(0,0);
   }
 
   displayEndScreen() {
     imageMode(CORNER);
     textSize(32);
-    shoeHit.displayGif();
+    shoeHit.displayGif(0,0);
     if (this.win) {
       this.typingButton.buttonText = "Continue";
     }
@@ -433,7 +443,7 @@ class TypingGame {
 class EatingGame {
   constructor() {
     this.lives = 20;
-    this.win = false;
+    this.win = true;
 
     // track variables
     this.trackSize = 64;
@@ -447,7 +457,7 @@ class EatingGame {
     this.arrowSpeed = 5;
 
     // Length and speed of game
-    this.amountOfArrows = 50;
+    this.amountOfArrows = 40;
     this.spawnRate = 600;
 
     // timer
@@ -457,8 +467,8 @@ class EatingGame {
 
 
     // End screen buttonTexts
-    this.winButton = new Button(320, 500, 300, 80, "Continue");
-    this.lossButton = new Button(320, 500, 300, 80, "Try Again");
+    this.winButton = new Button(320, 500, 300, 80, "Continue", 255);
+    this.lossButton = new Button(320, 500, 300, 80, "Try Again", 255);
   }
 
   // removes squares once they reach the bottom of the screen
@@ -508,6 +518,9 @@ class EatingGame {
   }
 
   displayBackground() {
+    // Draws the bush eating gif
+    pretzelGif.displayGif(0,0);
+
     // Draws vertical lines
     for (let i = 0; i < 5; i++) {
       line(this.trackX + this.trackSize * i, 0, this.trackX + this.trackSize * i, height);
@@ -547,6 +560,7 @@ class EatingGame {
   }
 
   displayTimer() {
+    fill(0);
     this.timeRemaining = (this.gameTimer.waitTime - (millis() - this.gameTimer.startTime)) / 1000;
     textAlign(RIGHT, BOTTOM);
     textSize(24);
@@ -563,8 +577,8 @@ class EatingGame {
     }
 
     if (this.gameTimer.timerIsDone) {
-      this.win = true;
       eatingState = 1;
+      this.win = true;
     }
   }
 }
@@ -605,7 +619,7 @@ class Arrow {
 class Menu {
   constructor() {
     // Creates first menu button button
-    this.menuButton = new Button(430, 200, 300, 150, "Select Level",255);
+    this.menuButton = new Button(430, 200, 300, 150, "Select Level", 255);
 
     // Creates the level buttons
     this.triviaGameButton = new Button(430, 150, 300, 75, "George Bush Knowledge Test", 255);
@@ -627,7 +641,7 @@ class Menu {
     this.menuButton.displayButton();
   }
 
-  displayLevelSelect(){
+  displayLevelSelect() {
     // Level select
     this.typingGameButton.isMouseOverButton();
     this.triviaGameButton.isMouseOverButton();
@@ -682,8 +696,18 @@ class Timer {
 }
 
 function mousePressed() {
+  // Makes button clickable on menu
+  if (state === 0) {
+    if (myMenu.menuButton.mouseOverButton) {
+      state = 4;
+      myTypingGame.createTimer(90000);
+      myEatingGame.createArrow();
+      myEatingGame.spawnTimer.reset(myEatingGame.spawnRate);
+    }
+  }
+
   // Makes buttons clickable in trivia game
-  if (state === 1 && triviaState === 0) {
+  else if (state === 1 && triviaState === 0) {
     if (myTrivia.buttonOne.mouseOverButton) {
       myTrivia.buttonChoice = 1;
       myTrivia.changeHappiness();
@@ -716,18 +740,18 @@ function mousePressed() {
         myTrivia.triviaLevel += 1;
       }
       else if (myTrivia.lives > 0) {
-        state = 2;
-        myTypingGame.createTimer(90000);
+        state = 0;
       }
       triviaState = 0;
     }
   }
 
   // Button on end screen of typing game
-  if (state === 2 && typingState === 1) {
+  else if (state === 2 && typingState === 1) {
     if (myTypingGame.typingButton.mouseOverButton) {
       if (myTypingGame.win) {
-        state = 3;
+        typingState;
+        state = 0;
       }
       else {
         myTypingGame.createTimer(90000);
@@ -740,26 +764,46 @@ function mousePressed() {
   }
 
   // Eating game buttons
-  if (myEatingGame.winButton.mouseOverButton) {
-    state = 0;
-  }
+  else if(state === 3){
+    if (myEatingGame.winButton.mouseOverButton) {
+      eatingState;
+      state = 0;
+    }
 
-  if (myEatingGame.lossButton.mouseOverButton) {
-    myEatingGame.gameTimer.reset(myEatingGame.spawnRate * myEatingGame.amountOfArrows);
-    myEatingGame.spawnTimer.reset(myEatingGame.spawnRate);
-    myEatingGame.lives = 5;
-    myEatingGame.arrowArray = [];
-    myEatingGame.createArrow();
-    eatingState = 0;
-  }
-
-  // Makes button clickable on menu
-  if (state === 0) {
-    if (myMenu.menuButton.mouseOverButton) {
-      state = 4;
-      myTypingGame.createTimer(90000);
-      myEatingGame.createArrow();
+    if (myEatingGame.lossButton.mouseOverButton) {
+      myEatingGame.gameTimer.reset(myEatingGame.spawnRate * myEatingGame.amountOfArrows);
       myEatingGame.spawnTimer.reset(myEatingGame.spawnRate);
+      myEatingGame.lives = 5;
+      myEatingGame.arrowArray = [];
+      myEatingGame.createArrow();
+      eatingState = 0;
+    }
+  }
+
+
+  // Level Select
+  else if (state === 4) {
+    if (myMenu.triviaGameButton.mouseOverButton) {
+      state = 1;
+      triviaState = 0;
+    }
+
+    if (myMenu.typingGameButton.mouseOverButton) {
+      myTypingGame.createTimer(90000);
+      myTypingGame.lives = 15;
+      myTypingGame.phrase = speeches[0];
+      state = 2;
+      typingState = 0;
+    }
+
+    if (myMenu.eatingGameButton.mouseOverButton) {
+      myEatingGame.gameTimer.reset(myEatingGame.spawnRate * myEatingGame.amountOfArrows);
+      myEatingGame.spawnTimer.reset(myEatingGame.spawnRate);
+      myEatingGame.lives = 5;
+      myEatingGame.arrowArray = [];
+      myEatingGame.createArrow();
+      state = 3;
+      eatingState = 0;
     }
   }
 }
