@@ -9,7 +9,7 @@ let triviaQuestions = [
 ];
 
 let speeches = [
-  "a","I believe God wants me to be president. I was chosen by the grace of God to lead at that moment. God told me to strike at al-Qaeda and I struck them, and then he instructed me to strike at Saddam, which I did, and now I am determined to solve the problem in the Middle East."
+  "I believe God wants me to be president. I was chosen by the grace of God to lead at that moment. God told me to strike at al-Qaeda and I struck them, and then he instructed me to strike at Saddam, which I did, and now I am determined to solve the problem in the Middle East."
 ];
 
 // Images
@@ -21,12 +21,13 @@ let radBush;
 let talkingBush; //Typing game background
 let shoeThrowHit; //Typing game possible end screen
 let bushEatingPretzel; //eating game background 1
+let bushChoking;
 
 // Gifs
 let talkingGif;
 let shoeHit;
 let pretzelGif;
-
+let chokeGif;
 
 // Classes
 let myTrivia;
@@ -62,6 +63,7 @@ function preload() {
     loadImage("images/ShoedParts/Shoe11.png"), loadImage("images/ShoedParts/Shoe11.png"),
   ];
   bushEatingPretzel = [loadImage("images/bushPretzel/pretzel1.png"), loadImage("images/bushPretzel/pretzel2.png")];
+  bushChoking = [loadImage("images/bushChoke/choke1.png"), loadImage("images/bushChoke/choke2.png")];
 }
 
 function setup() {
@@ -75,6 +77,7 @@ function setup() {
   talkingGif = new Gif(200, talkingBush);
   shoeHit = new Gif(60, shoeThrowHit);
   pretzelGif = new Gif(200, bushEatingPretzel);
+  chokeGif = new Gif(300, bushChoking);
 }
 
 function draw() {
@@ -468,7 +471,7 @@ class EatingGame {
 
     // End screen buttonTexts
     this.winButton = new Button(320, 500, 300, 80, "Continue", 255);
-    this.lossButton = new Button(320, 500, 300, 80, "Try Again", 255);
+    this.lossButton = new Button(480, 320, 300, 80, "Try Again", 255);
   }
 
   // removes squares once they reach the bottom of the screen
@@ -495,7 +498,26 @@ class EatingGame {
     }
 
     else {
-      image(sadBush, 0, 0);
+      // Draws vertical lines
+      for (let i = 0; i < 5; i++) {
+        line(this.trackX + this.trackSize * i, 0, this.trackX + this.trackSize * i, height);
+      }
+
+      // Draws horizontal lines
+      for (let i = 0; i < 2; i++) {
+        line(this.trackX, this.trackY + this.trackSize * i, width - this.trackSize, this.trackY + this.trackSize * i);
+      }
+
+      // Draws left arrow
+      fill(0, 50);
+      triangle(320, 512, 384, 480, 384, 544);
+      // Draws up arrow
+      triangle(384, 544, 448, 544, 416, 480);
+      // Draws down arrow
+      triangle(448, 480, 512, 480, 480, 544);
+      // Draws right arrow
+      triangle(576, 512, 512, 480, 512, 544);
+      chokeGif.displayGif(-160,0);
 
       this.lossButton.isMouseOverButton();
       fill(0, 0, 200, 200);
@@ -519,7 +541,7 @@ class EatingGame {
 
   displayBackground() {
     // Draws the bush eating gif
-    pretzelGif.displayGif(0,0);
+    pretzelGif.displayGif(-160,0);
 
     // Draws vertical lines
     for (let i = 0; i < 5; i++) {
@@ -750,7 +772,6 @@ function mousePressed() {
   else if (state === 2 && typingState === 1) {
     if (myTypingGame.typingButton.mouseOverButton) {
       if (myTypingGame.win) {
-        typingState;
         state = 0;
       }
       else {
@@ -766,7 +787,6 @@ function mousePressed() {
   // Eating game buttons
   else if(state === 3){
     if (myEatingGame.winButton.mouseOverButton) {
-      eatingState;
       state = 0;
     }
 
