@@ -9,7 +9,9 @@ let triviaQuestions = [
 ];
 
 let speeches = [
-  "I believe God wants me to be president. I was chosen by the grace of God to lead at that moment. God told me to strike at al-Qaeda and I struck them, and then he instructed me to strike at Saddam, which I did, and now I am determined to solve the problem in the Middle East."
+  "test"
+  ,"I believe God wants me to be president. I was chosen by the grace of God to lead at that moment. God told me to strike at al-Qaeda and I struck them, and then he instructed me to strike at Saddam, which I did, and now I am determined to solve the problem in the Middle East."
+  ,"test"
 ];
 
 // Images
@@ -21,12 +23,14 @@ let radBush;
 let talkingBush; //Typing game background
 let shoeThrowHit; //Typing game possible end screen
 let bushEatingPretzel; //eating game background 1
+let bushEatingPizza; //eating game background 2
 let bushChoking;
 
 // Gifs
 let talkingGif;
 let shoeHit;
 let pretzelGif;
+let pizzaGif;
 let chokeGif;
 
 // Classes
@@ -63,6 +67,7 @@ function preload() {
     loadImage("images/ShoedParts/Shoe11.png"), loadImage("images/ShoedParts/Shoe11.png"),
   ];
   bushEatingPretzel = [loadImage("images/bushPretzel/pretzel1.png"), loadImage("images/bushPretzel/pretzel2.png")];
+  bushEatingPizza = [loadImage("images/bushPizza/pizza1.png"), loadImage("images/bushPizza/pizza2.png")];
   bushChoking = [loadImage("images/bushChoke/choke1.png"), loadImage("images/bushChoke/choke2.png")];
 }
 
@@ -77,6 +82,7 @@ function setup() {
   talkingGif = new Gif(200, talkingBush);
   shoeHit = new Gif(60, shoeThrowHit);
   pretzelGif = new Gif(200, bushEatingPretzel);
+  pizzaGif = new Gif(200, bushEatingPizza);
   chokeGif = new Gif(300, bushChoking);
 }
 
@@ -356,6 +362,7 @@ class Trivia {
 class TypingGame {
   constructor() {
     this.speechLevel = 0;
+    this.maxSpeechLevel = speeches.length;
     this.lives = 15;
     this.phrase = speeches[this.speechLevel];
     this.firstLetter = this.phrase[0];
@@ -445,7 +452,9 @@ class TypingGame {
 
 class EatingGame {
   constructor() {
-    this.lives = 20;
+    this.level = 0;
+    this.maxLevel = 2;
+    this.lives;
     this.win = true;
 
     // track variables
@@ -457,15 +466,15 @@ class EatingGame {
     this.arrowArray = [];
 
     // arrow speed
-    this.arrowSpeed = 5;
+    this.arrowSpeed = [3, 5];
 
     // Length and speed of game
-    this.amountOfArrows = 40;
-    this.spawnRate = 600;
+    this.amountOfArrows = [5, 40];
+    this.spawnRate = [1000, 600];
 
     // timer
-    this.spawnTimer = new Timer(this.spawnRate);
-    this.gameTimer = new Timer(this.spawnRate * this.amountOfArrows);
+    this.spawnTimer = new Timer(this.spawnRate[this.level]);
+    this.gameTimer = new Timer(this.spawnRate[this.level] * this.amountOfArrows[this.level]);
     this.timeRemaining;
 
 
@@ -541,8 +550,12 @@ class EatingGame {
 
   displayBackground() {
     // Draws the bush eating gif
-    pretzelGif.displayGif(-160,0);
-
+    if (this.level === 0){
+      pizzaGif.displayGif(-160,0);
+    }
+    else if (this.level === 1){
+      pretzelGif.displayGif(-160,0);
+    }
     // Draws vertical lines
     for (let i = 0; i < 5; i++) {
       line(this.trackX + this.trackSize * i, 0, this.trackX + this.trackSize * i, height);
@@ -571,8 +584,8 @@ class EatingGame {
   }
 
   createArrow() {
-    this.arrowArray.push(new Arrow(floor(random(4)), this.arrowSpeed));
-    this.arrowArray.push(new Arrow(floor(random(4)), this.arrowSpeed));
+    this.arrowArray.push(new Arrow(floor(random(4)), this.arrowSpeed[this.level]));
+    this.arrowArray.push(new Arrow(floor(random(4)), this.arrowSpeed[this.level]));
   }
 
   displayFallingArrows() {
@@ -595,7 +608,7 @@ class EatingGame {
 
     if (this.spawnTimer.timerIsDone) {
       this.createArrow();
-      this.spawnTimer.reset(this.spawnRate);
+      this.spawnTimer.reset(this.spawnRate[this.level]);
     }
 
     if (this.gameTimer.timerIsDone) {
@@ -772,28 +785,52 @@ function mousePressed() {
   else if (state === 2 && typingState === 1) {
     if (myTypingGame.typingButton.mouseOverButton) {
       if (myTypingGame.win) {
-        state = 0;
+        if (myTypingGame.speechLevel < myTypingGame.maxSpeechLevel - 1){
+          myTypingGame.speechLevel += 1;
+          myTypingGame.createTimer(90000);
+          myTypingGame.lives = 15;
+          myTypingGame.phrase = speeches[myTypingGame.speechLevel];
+          myTypingGame.firstLetter = myTypingGame.phrase[0];
+          typingState = 0;
+        }
+
+        else{
+          state = 0;
+        }
       }
       else {
         myTypingGame.createTimer(90000);
         myTypingGame.lives = 15;
-        myTypingGame.phrase = speeches[0];
+        myTypingGame.phrase = speeches[myTypingGame.speechLevel];
+        myTypingGame.firstLetter = myTypingGame.phrase[0];
         typingState = 0;
-        myTypingGame.firstLetter = this.phrase[0];
       }
     }
   }
 
   // Eating game buttons
-  else if(state === 3){
+  else if(state === 3 && eatingState === 1){
     if (myEatingGame.winButton.mouseOverButton) {
-      state = 0;
+      if (myEatingGame.level < myEatingGame.maxLevel - 1){
+        myEatingGame.level += 1;
+        myEatingGame.gameTimer.reset(myEatingGame.spawnRate[myEatingGame.level] * myEatingGame.amountOfArrows[myEatingGame.level]);
+        myEatingGame.spawnTimer.reset(myEatingGame.spawnRate[myEatingGame.level]);
+        myEatingGame.lives = 10;
+        myEatingGame.arrowArray = [];
+        myEatingGame.createArrow();
+        eatingState = 0;
+        myEatingGame.winButton.mouseOverButton = false;
+      }
+      else{
+        myEatingGame.level = 0;
+        state = 0;
+      }
     }
 
-    if (myEatingGame.lossButton.mouseOverButton) {
-      myEatingGame.gameTimer.reset(myEatingGame.spawnRate * myEatingGame.amountOfArrows);
-      myEatingGame.spawnTimer.reset(myEatingGame.spawnRate);
-      myEatingGame.lives = 5;
+    else if (myEatingGame.lossButton.mouseOverButton) {
+      myEatingGame.gameTimer.reset(myEatingGame.spawnRate[myEatingGame.level] * myEatingGame.amountOfArrows[myEatingGame.level]);
+      myEatingGame.spawnTimer.reset(myEatingGame.spawnRate[myEatingGame.level]);
+      myEatingGame.lives = 10;
       myEatingGame.arrowArray = [];
       myEatingGame.createArrow();
       eatingState = 0;
@@ -817,9 +854,9 @@ function mousePressed() {
     }
 
     if (myMenu.eatingGameButton.mouseOverButton) {
-      myEatingGame.gameTimer.reset(myEatingGame.spawnRate * myEatingGame.amountOfArrows);
-      myEatingGame.spawnTimer.reset(myEatingGame.spawnRate);
-      myEatingGame.lives = 5;
+      myEatingGame.gameTimer.reset(myEatingGame.spawnRate[0] * myEatingGame.amountOfArrows[0]);
+      myEatingGame.spawnTimer.reset(myEatingGame.spawnRate[0]);
+      myEatingGame.lives = 10;
       myEatingGame.arrowArray = [];
       myEatingGame.createArrow();
       state = 3;
@@ -861,8 +898,8 @@ function keyPressed() {
   }
 
   //Eating game
-  if (state === 3) {
-    if (keyCode === 65) {
+  if (state === 3 && eatingState === 0) {
+    if (keyCode === 65 || keyCode === LEFT_ARROW) {
       // Left arrow === 0
       eatingCheck = true;
       for (let i = 0; i < myEatingGame.arrowArray.length - 1; i++) {
@@ -889,7 +926,7 @@ function keyPressed() {
       }
     }
 
-    if (keyCode === 83) {
+    if (keyCode === 83 || keyCode === UP_ARROW) {
       // Up arrow === 1
       eatingCheck = true;
       for (let i = 0; i < myEatingGame.arrowArray.length - 1; i++) {
@@ -916,7 +953,7 @@ function keyPressed() {
       }
     }
 
-    if (keyCode === 68) {
+    if (keyCode === 68 || keyCode === DOWN_ARROW) {
       // Down Arrow === 2
       eatingCheck = true;
       for (let i = 0; i < myEatingGame.arrowArray.length - 1; i++) {
@@ -943,7 +980,7 @@ function keyPressed() {
       }
     }
 
-    if (keyCode === 70) {
+    if (keyCode === 70 || keyCode === RIGHT_ARROW) {
       // Right arrow === 3
       eatingCheck = true;
       for (let i = 0; i < myEatingGame.arrowArray.length - 1; i++) {
