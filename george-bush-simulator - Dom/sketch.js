@@ -862,7 +862,7 @@ function keyPressed() {
 
   //Eating game
   if (state === 3) {
-    if (keyCode === LEFT_ARROW) {
+    if (keyCode === 65) {
       // Left arrow === 0
       eatingCheck = true;
       for (let i = 0; i < myEatingGame.arrowArray.length - 1; i++) {
@@ -889,7 +889,7 @@ function keyPressed() {
       }
     }
 
-    if (keyCode === UP_ARROW) {
+    if (keyCode === 83) {
       // Up arrow === 1
       eatingCheck = true;
       for (let i = 0; i < myEatingGame.arrowArray.length - 1; i++) {
@@ -916,7 +916,7 @@ function keyPressed() {
       }
     }
 
-    if (keyCode === DOWN_ARROW) {
+    if (keyCode === 68) {
       // Down Arrow === 2
       eatingCheck = true;
       for (let i = 0; i < myEatingGame.arrowArray.length - 1; i++) {
@@ -943,7 +943,7 @@ function keyPressed() {
       }
     }
 
-    if (keyCode === RIGHT_ARROW) {
+    if (keyCode === 70) {
       // Right arrow === 3
       eatingCheck = true;
       for (let i = 0; i < myEatingGame.arrowArray.length - 1; i++) {
