@@ -9,9 +9,9 @@ let triviaQuestions = [
 ];
 
 let speeches = [
-  "test"
-  ,"I believe God wants me to be president. I was chosen by the grace of God to lead at that moment. God told me to strike at al-Qaeda and I struck them, and then he instructed me to strike at Saddam, which I did, and now I am determined to solve the problem in the Middle East."
-  ,"test"
+  "I believe God wants me to be president. I was chosen by the grace of God to lead at that moment. God told me to strike at al-Qaeda and I struck them, and then he instructed me to strike at Saddam, which I did, and now I am determined to solve the problem in the Middle East."
+  ,"One of the hardest parts of my job is to connect Iraq to the war on terror. I think war is a dangerous place. If this were a dictatorship it would be a heck of a lot easier... as long as I am the dictator. Hehehe."
+  ,"I reads every chance I can gets. It is clearly a budget. Its got lots of numbers in it. It has come to my attention, that air pollution is polluting the air. In my sentences I go where no man has gone before."
 ];
 
 // Images
