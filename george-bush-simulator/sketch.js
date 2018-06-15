@@ -9,8 +9,13 @@ let triviaQuestions = [
 ];
 
 let speeches = [
-  "I believe God wants me to be president. I was chosen by the grace of God to lead at that moment. God told me to strike at al-Qaeda and I struck them, and then he instructed me to strike at Saddam, which I did, and now I am determined to solve the problem in the Middle East.", "One of the hardest parts of my job is to connect Iraq to the war on terror. I think war is a dangerous place. If this were a dictatorship it would be a heck of a lot easier... as long as I am the dictator. Hehehe.", "I reads every chance I can gets. It is clearly a budget. Its got lots of numbers in it. It has come to my attention, that air pollution is polluting the air. In my sentences I go where no man has gone before."
+  "I believe God wants me to be president. I was chosen by the grace of God to lead at that moment. God told me to strike at al-Qaeda and I struck them, and then he instructed me to strike at Saddam, which I did, and now I am determined to solve the problem in the Middle East."
+  , "One of the hardest parts of my job is to connect Iraq to the war on terror. I think war is a dangerous place. If this were a dictatorship it would be a heck of a lot easier... as long as I am the dictator. Hehehe."
+  , "I reads every chance I can gets. It is clearly a budget. Its got lots of numbers in it. It has come to my attention, that air pollution is polluting the air. In my sentences I go where no man has gone before."
 ];
+
+// sounds
+let starSpangledBanner;
 
 // Images
 let menuBackground;
@@ -56,6 +61,9 @@ let buttonChoice;
 let eatingCheck;
 
 function preload() {
+  // Laods sounds
+  starSpangledBanner = loadSound("starSpangledJay.mp3");
+
   // Loads still pictures
   menuBackground = loadImage("images/startScreen.png");
   angryBush = loadImage("images/angryBush.png");
@@ -100,10 +108,17 @@ function setup() {
   catGif = new Gif(200, bushEatingCat);
   chokeGif = new Gif(300, bushChoking);
   oilRigGif = new Gif(600, oilRig);
+
+  // Plays song
+  // starSpangledBanner.play();
 }
 
 function draw() {
   background(255);
+  // Loops song
+  if(!starSpangledBanner.isPlaying()){
+    starSpangledBanner.play();
+  }
   // Menu
   if (state === 0) {
     myMenu.displayMenu();
@@ -166,6 +181,7 @@ class Button {
     this.buttonHeight = height;
     this.buttonText = string;
     this.mouseOverButton = false;
+    // Text colour
     this.colour = colour;
   }
 
@@ -304,7 +320,6 @@ class Trivia {
     this.buttonFour.displayButton();
   }
 
-
   displayQuestion() {
     // Displays background
     oilRigGif.displayGif(0, -50);
@@ -366,13 +381,15 @@ class Trivia {
   changeHappiness() {
     if (triviaQuestions[this.triviaLevel][4 + this.buttonChoice] === 1) {
       this.georgeBushHappiness += 1;
+      this.nextQuestionButton.buttonText = "Continue";
     }
     else if (triviaQuestions[this.triviaLevel][4 + this.buttonChoice] === 0 && this.lives > 1) {
       this.lives -= 1;
       this.georgeBushHappiness = 0;
+      this.nextQuestionButton.buttonText = "Continue";
     }
-    else if (triviaQuestions[this.triviaLevel][4 + this.buttonChoice] === 0) {
-      this.lives = 3;
+    else{
+      this.lives -= 1;
       this.georgeBushHappiness = 0;
       this.triviaLevel = 0;
       this.nextQuestionButton.buttonText = "Try Again";
@@ -799,12 +816,18 @@ function mousePressed() {
   else if (state === 1 && triviaState === 1) {
     if (myTrivia.nextQuestionButton.mouseOverButton) {
       if (myTrivia.triviaLevel < myTrivia.triviaMaxLevel) {
-        myTrivia.triviaLevel += 1;
+        if (myTrivia.lives > 0){
+          myTrivia.triviaLevel += 1;
+          triviaState = 0;
+        }
+        else{
+          myTrivia.lives = 3;
+          triviaState = 0;
+        }
       }
       else if (myTrivia.lives > 0) {
         state = 0;
       }
-      triviaState = 0;
     }
   }
 
@@ -862,9 +885,9 @@ function mousePressed() {
       myEatingGame.arrowArray = [];
       myEatingGame.createArrow();
       eatingState = 0;
+      myEatingGame.lossButton.mouseOverButton = false;
     }
   }
-
 
   // Level Select
   else if (state === 4) {
@@ -922,7 +945,6 @@ function keyPressed() {
     else {
       myTypingGame.removeLife();
     }
-
   }
 
   //Eating game
@@ -987,18 +1009,18 @@ function keyPressed() {
       for (let i = 0; i < myEatingGame.arrowArray.length - 1; i++) {
         // since I am spawning two random squares at a time, sometimes they will spawn on top of each other. This checks for that
         if (myEatingGame.arrowArray[i].arrowDir === 2 &&
-          myEatingGame.arrowArray[i + 1].arrowDir === 2 &&
-          myEatingGame.arrowArray[i].y >= myEatingGame.trackY - 32 &&
-          myEatingGame.arrowArray[i].y <= myEatingGame.trackY + 32 &&
-          myEatingGame.arrowArray[i + 1].y >= myEatingGame.trackY - 32 &&
-          myEatingGame.arrowArray[i + 1].y <= myEatingGame.trackY + 32) {
+        myEatingGame.arrowArray[i + 1].arrowDir === 2 &&
+        myEatingGame.arrowArray[i].y >= myEatingGame.trackY - 32 &&
+        myEatingGame.arrowArray[i].y <= myEatingGame.trackY + 32 &&
+        myEatingGame.arrowArray[i + 1].y >= myEatingGame.trackY - 32 &&
+        myEatingGame.arrowArray[i + 1].y <= myEatingGame.trackY + 32) {
           eatingCheck = false;
           myEatingGame.arrowArray.splice(i, 2);
         }
 
         if (myEatingGame.arrowArray[i].arrowDir === 2 &&
-          myEatingGame.arrowArray[i].y >= myEatingGame.trackY - 32 &&
-          myEatingGame.arrowArray[i].y <= myEatingGame.trackY + 32) {
+        myEatingGame.arrowArray[i].y >= myEatingGame.trackY - 32 &&
+        myEatingGame.arrowArray[i].y <= myEatingGame.trackY + 32) {
           eatingCheck = false;
           myEatingGame.arrowArray.splice(i, 1);
         }
