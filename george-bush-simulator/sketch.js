@@ -9,9 +9,7 @@ let triviaQuestions = [
 ];
 
 let speeches = [
-  "I believe God wants me to be president. I was chosen by the grace of God to lead at that moment. God told me to strike at al-Qaeda and I struck them, and then he instructed me to strike at Saddam, which I did, and now I am determined to solve the problem in the Middle East."
-  ,"One of the hardest parts of my job is to connect Iraq to the war on terror. I think war is a dangerous place. If this were a dictatorship it would be a heck of a lot easier... as long as I am the dictator. Hehehe."
-  ,"I reads every chance I can gets. It is clearly a budget. Its got lots of numbers in it. It has come to my attention, that air pollution is polluting the air. In my sentences I go where no man has gone before."
+  "I believe God wants me to be president. I was chosen by the grace of God to lead at that moment. God told me to strike at al-Qaeda and I struck them, and then he instructed me to strike at Saddam, which I did, and now I am determined to solve the problem in the Middle East.", "One of the hardest parts of my job is to connect Iraq to the war on terror. I think war is a dangerous place. If this were a dictatorship it would be a heck of a lot easier... as long as I am the dictator. Hehehe.", "I reads every chance I can gets. It is clearly a budget. Its got lots of numbers in it. It has come to my attention, that air pollution is polluting the air. In my sentences I go where no man has gone before."
 ];
 
 // Images
@@ -24,14 +22,20 @@ let talkingBush; //Typing game background
 let shoeThrowHit; //Typing game possible end screen
 let bushEatingPretzel; //eating game background 1
 let bushEatingPizza; //eating game background 2
+let bushEatingCat; //eating game background 3
 let bushChoking;
+let bushDodge;
+let oilRig;
 
 // Gifs
 let talkingGif;
 let shoeHit;
+let dodgeGif;
 let pretzelGif;
 let pizzaGif;
+let catGif;
 let chokeGif;
+let oilRigGif;
 
 // Classes
 let myTrivia;
@@ -52,6 +56,7 @@ let buttonChoice;
 let eatingCheck;
 
 function preload() {
+  // Loads still pictures
   menuBackground = loadImage("images/startScreen.png");
   angryBush = loadImage("images/angryBush.png");
   sadBush = loadImage("images/sadBush.png");
@@ -66,9 +71,17 @@ function preload() {
     loadImage("images/ShoedParts/Shoe10.png"), loadImage("images/ShoedParts/Shoe11.png"), loadImage("images/ShoedParts/Shoe11.png"),
     loadImage("images/ShoedParts/Shoe11.png"), loadImage("images/ShoedParts/Shoe11.png"),
   ];
+  bushDodge = [loadImage("images/Dodge/Dodge1.png"), loadImage("images/Dodge/Dodge2.png"), loadImage("images/Dodge/Dodge3.png"),
+    loadImage("images/Dodge/Dodge4.png"), loadImage("images/Dodge/Dodge5.png"), loadImage("images/Dodge/Dodge6.png"), loadImage("images/Dodge/Dodge7.png"),
+    loadImage("images/Dodge/Dodge8.png"), loadImage("images/Dodge/Dodge9.png"), loadImage("images/Dodge/Dodge10.png"), loadImage("images/Dodge/Dodge11.png"),
+    loadImage("images/Dodge/Dodge12.png"), loadImage("images/Dodge/Dodge13.png"), loadImage("images/Dodge/Dodge14.png"), loadImage("images/Dodge/Dodge15.png"),
+    loadImage("images/Dodge/Dodge16.png"), loadImage("images/Dodge/Dodge17.png"), loadImage("images/Dodge/Dodge17.png"), loadImage("images/Dodge/Dodge17.png")
+  ];
+  bushEatingCat = [loadImage("images/bushCat/bushcat1.png"), loadImage("images/bushCat/bushcat2.png")];
   bushEatingPretzel = [loadImage("images/bushPretzel/pretzel1.png"), loadImage("images/bushPretzel/pretzel2.png")];
   bushEatingPizza = [loadImage("images/bushPizza/pizza1.png"), loadImage("images/bushPizza/pizza2.png")];
   bushChoking = [loadImage("images/bushChoke/choke1.png"), loadImage("images/bushChoke/choke2.png")];
+  oilRig = [loadImage("images/oilrig/oilrig1.png"), loadImage("images/oilrig/oilrig2.png")];
 }
 
 function setup() {
@@ -81,13 +94,16 @@ function setup() {
   // Animations
   talkingGif = new Gif(200, talkingBush);
   shoeHit = new Gif(60, shoeThrowHit);
+  dodgeGif = new Gif(60, bushDodge);
   pretzelGif = new Gif(200, bushEatingPretzel);
   pizzaGif = new Gif(200, bushEatingPizza);
+  catGif = new Gif(200, bushEatingCat);
   chokeGif = new Gif(300, bushChoking);
+  oilRigGif = new Gif(600, oilRig);
 }
 
 function draw() {
-  background(225);
+  background(255);
   // Menu
   if (state === 0) {
     myMenu.displayMenu();
@@ -96,8 +112,8 @@ function draw() {
   // Trivia
   else if (state === 1) {
     if (triviaState === 0) {
-      myTrivia.displayButtons();
       myTrivia.displayQuestion();
+      myTrivia.displayButtons();
       myTrivia.displayLives();
     }
 
@@ -108,6 +124,7 @@ function draw() {
 
   // Typing game
   else if (state === 2) {
+    background(225);
     if (typingState === 0) {
       myTypingGame.displayBackground();
       myTypingGame.displayPhrase();
@@ -122,6 +139,7 @@ function draw() {
 
   // Eating game
   else if (state === 3) {
+    background(225);
     if (eatingState === 0) {
       myEatingGame.controlGame();
       myEatingGame.displayBackground();
@@ -170,7 +188,6 @@ class Button {
     }
   }
 }
-
 
 class Gif {
   constructor(timePerImage, image) {
@@ -289,6 +306,10 @@ class Trivia {
 
 
   displayQuestion() {
+    // Displays background
+    oilRigGif.displayGif(0, -50);
+
+    // Displays
     rectMode(CENTER);
     fill(175, 0, 0);
     rect(this.questionx, this.questiony, this.questionWidth, this.questionHeight);
@@ -427,20 +448,21 @@ class TypingGame {
 
   displayBackground() {
     imageMode(CORNER);
-    talkingGif.displayGif(0,0);
+    talkingGif.displayGif(0, 0);
   }
 
   displayEndScreen() {
     imageMode(CORNER);
     textSize(32);
-    shoeHit.displayGif(0,0);
     if (this.win) {
+      dodgeGif.displayGif(0, 0);
       this.typingButton.buttonText = "Continue";
     }
-
     else {
+      shoeHit.displayGif(0, 0);
       this.typingButton.buttonText = "Try Again";
     }
+
     fill(0, 0, 255, 200);
     if (this.typingButton.mouseOverButton) {
       fill(0, 0, 200, 250);
@@ -453,7 +475,7 @@ class TypingGame {
 class EatingGame {
   constructor() {
     this.level = 0;
-    this.maxLevel = 2;
+    this.maxLevel = 3;
     this.lives;
     this.win = true;
 
@@ -466,11 +488,11 @@ class EatingGame {
     this.arrowArray = [];
 
     // arrow speed
-    this.arrowSpeed = [3, 5];
+    this.arrowSpeed = [3, 4, 5];
 
     // Length and speed of game
-    this.amountOfArrows = [5, 40];
-    this.spawnRate = [1000, 600];
+    this.amountOfArrows = [15, 25, 40];
+    this.spawnRate = [1000, 800, 600];
 
     // timer
     this.spawnTimer = new Timer(this.spawnRate[this.level]);
@@ -526,7 +548,7 @@ class EatingGame {
       triangle(448, 480, 512, 480, 480, 544);
       // Draws right arrow
       triangle(576, 512, 512, 480, 512, 544);
-      chokeGif.displayGif(-160,0);
+      chokeGif.displayGif(-160, 0);
 
       this.lossButton.isMouseOverButton();
       fill(0, 0, 200, 200);
@@ -543,18 +565,23 @@ class EatingGame {
       this.lives -= 1;
     }
     else {
-      eatingState = 1;
       this.win = false;
+      eatingState = 1;
     }
   }
 
   displayBackground() {
     // Draws the bush eating gif
-    if (this.level === 0){
-      pizzaGif.displayGif(-160,0);
+    if (this.level === 0) {
+      pizzaGif.displayGif(-160, 0);
     }
-    else if (this.level === 1){
-      pretzelGif.displayGif(-160,0);
+
+    else if (this.level === 1) {
+      catGif.displayGif(-160, 0);
+    }
+
+    else if (this.level === 2) {
+      pretzelGif.displayGif(-160, 0);
     }
     // Draws vertical lines
     for (let i = 0; i < 5; i++) {
@@ -785,16 +812,17 @@ function mousePressed() {
   else if (state === 2 && typingState === 1) {
     if (myTypingGame.typingButton.mouseOverButton) {
       if (myTypingGame.win) {
-        if (myTypingGame.speechLevel < myTypingGame.maxSpeechLevel - 1){
+        if (myTypingGame.speechLevel < myTypingGame.maxSpeechLevel - 1) {
           myTypingGame.speechLevel += 1;
           myTypingGame.createTimer(90000);
           myTypingGame.lives = 15;
           myTypingGame.phrase = speeches[myTypingGame.speechLevel];
           myTypingGame.firstLetter = myTypingGame.phrase[0];
+          myTypingGame.win = false;
           typingState = 0;
         }
 
-        else{
+        else {
           state = 0;
         }
       }
@@ -809,9 +837,9 @@ function mousePressed() {
   }
 
   // Eating game buttons
-  else if(state === 3 && eatingState === 1){
+  else if (state === 3 && eatingState === 1) {
     if (myEatingGame.winButton.mouseOverButton) {
-      if (myEatingGame.level < myEatingGame.maxLevel - 1){
+      if (myEatingGame.level < myEatingGame.maxLevel - 1) {
         myEatingGame.level += 1;
         myEatingGame.gameTimer.reset(myEatingGame.spawnRate[myEatingGame.level] * myEatingGame.amountOfArrows[myEatingGame.level]);
         myEatingGame.spawnTimer.reset(myEatingGame.spawnRate[myEatingGame.level]);
@@ -821,7 +849,7 @@ function mousePressed() {
         eatingState = 0;
         myEatingGame.winButton.mouseOverButton = false;
       }
-      else{
+      else {
         myEatingGame.level = 0;
         state = 0;
       }
